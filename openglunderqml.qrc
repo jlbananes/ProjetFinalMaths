@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/ProjetFinalMaths/main.qml</file>
+    </qresource>
+    <qresource prefix="/Shaders">
+        <file>Shaders/FragmentShader.frag</file>
+        <file>Shaders/VertexShader.vert</file>
+    </qresource>
+</RCC>
