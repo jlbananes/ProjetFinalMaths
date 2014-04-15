@@ -20,5 +20,7 @@ int main(int argc, char **argv)
 
     // Bijour 2 !
 
+    // Encore un bijour \o/
+
     return app.exec();
 }
