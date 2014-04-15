@@ -118,10 +118,10 @@ void Squircle::paint()
 
     if (!m_program)
     {
-        /* C:\\Users\\t-jpeti\\workspace\\ProjetFinalMaths\\ */
+        /* D:\\Workspace */
         m_program = new QOpenGLShaderProgram();
-        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "C:\\Users\\t-jpeti\\workspace\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
-        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "C:\\Users\\t-jpeti\\workspace\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "D:\\Workspace\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "D:\\Workspace\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
         m_program->bindAttributeLocation("gl_Vertex", 0);
         m_program->link();
 

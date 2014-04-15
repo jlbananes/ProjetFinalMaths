@@ -6,7 +6,7 @@
 #include <QtOpenGL>
 #include <math.h>
 #include <GL/gl.h>
-#include <GL/glaux.h>
+//#include <GL/glaux.h>
 #include <GL/glu.h>
 
 class Squircle : public QQuickItem
