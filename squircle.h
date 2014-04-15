@@ -6,7 +6,6 @@
 #include <QtOpenGL>
 #include <math.h>
 #include <GL/gl.h>
-//#include <GL/glaux.h>
 #include <GL/glu.h>
 
 class Squircle : public QQuickItem
@@ -40,7 +39,5 @@ private:
     qreal m_t;
     qreal m_thread_t;
 };
-
-
 
 #endif // SQUIRCLE_H
