@@ -9,5 +9,6 @@
 
 importMesh::importMesh()
 {
+    //Create instance
 }
 
