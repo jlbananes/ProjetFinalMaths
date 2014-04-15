@@ -18,7 +18,6 @@ int main(int argc, char **argv)
 
     // Bijour !
 
-    // Bijour 2 !
 
     return app.exec();
 }
