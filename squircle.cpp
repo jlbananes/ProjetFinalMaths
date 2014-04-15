@@ -120,8 +120,8 @@ void Squircle::paint()
     {
         /* D:\\Workspace */
         m_program = new QOpenGLShaderProgram();
-        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "D:\\Workspace\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
-        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "D:\\Workspace\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "..\\..\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "..\\..\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
         m_program->bindAttributeLocation("gl_Vertex", 0);
         m_program->link();
 
@@ -140,7 +140,7 @@ void Squircle::paint()
     qreal ratio = window()->devicePixelRatio();
     int w = int(ratio * window()->width());
     int h = int(ratio * window()->height());
-    pMatrix.perspective(60.0, (float) w / (float) h, 0.001, 1000);
+    pMatrix.perspective(60.0, (double) w / (double) h, 0.001, 1000);
     glViewport(0, 0, w, h);
 
     glMatrixMode(GL_PROJECTION|GL_MODELVIEW);
