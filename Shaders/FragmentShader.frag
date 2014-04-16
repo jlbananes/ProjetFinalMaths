@@ -2,12 +2,12 @@
 //http://www.youtube.com/watch?v=MRD_zN0SWh0
 
 //uniform vec4 normals;
-//uniform vec4 color;
+uniform vec4 color;
 //uniform lowp float t;
 //varying highp vec2 coords;
 
 //in vec4 varyingColor;
-in vec3 color;
+//in vec3 color;
 
 void main(void)
 {
