@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:///qml/ProjetFinalMaths/main.qml"));
-    view.show();
+    view.showFullScreen();
 
     QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
 
