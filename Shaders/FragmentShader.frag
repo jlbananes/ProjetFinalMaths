@@ -15,5 +15,6 @@ void main(void)
     i = smoothstep(0.8, 0.8, 0.8);
     i = floor(i * 20.) / 20.;
     gl_FragColor = vec4(coords * .5 + .5, i, i);*/
-    gl_FragColor = vec4(color, 1.0f);
+    //gl_FragColor = vec4(color, 1.0f);
+    gl_FragColor = color;
 }
