@@ -53,57 +53,116 @@ void Squircle::paint()
     static const GLfloat lightpos[] = {.5, 1., 1., 0.};
     GLfloat values[] =
     {
-        -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-        -1.0f,-1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f, // triangle 1 : end
+        // face x=-1
+        -1.0,-1.0,-1.0, // triangle 1 : begin
+        -1.0,-1.0, 1.0,
+        -1.0, 1.0, 1.0, // triangle 1 : end
 
-        1.0f, 1.0f,-1.0f, // triangle 2 : begin
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f, // triangle 2 : end
+        -1.0,-1.0,-1.0,
+        -1.0, 1.0, 1.0,
+        -1.0, 1.0,-1.0,
 
-        1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
+        // face y=-1
+        1.0,-1.0, 1.0,
+        -1.0,-1.0,-1.0,
+        1.0,-1.0,-1.0,
 
-        1.0f, 1.0f,-1.0f,
-        1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
+        1.0,-1.0, 1.0,
+        -1.0,-1.0, 1.0,
+        -1.0,-1.0,-1.0,
 
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
+        // face z=-1
+        1.0, 1.0,-1.0,
+        -1.0,-1.0,-1.0,
+        -1.0, 1.0,-1.0,
 
-        1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
+        1.0, 1.0,-1.0,
+        1.0,-1.0,-1.0,
+        -1.0,-1.0,-1.0,
 
-        -1.0f, 1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f,
+        // face x=1
+        1.0, 1.0, 1.0,
+        1.0,-1.0,-1.0,
+        1.0, 1.0,-1.0,
 
-        1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f,-1.0f,
+        1.0,-1.0,-1.0,
+        1.0, 1.0, 1.0,
+        1.0,-1.0, 1.0,
 
-        1.0f,-1.0f,-1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f,
+        // face y=1
+        1.0, 1.0, 1.0,
+        1.0, 1.0,-1.0,
+        -1.0, 1.0,-1.0,
 
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f,
+        1.0, 1.0, 1.0,
+        -1.0, 1.0,-1.0,
+        -1.0, 1.0, 1.0,
 
-        1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
+        // face z=1
+        -1.0, 1.0, 1.0,
+        -1.0,-1.0, 1.0,
+        1.0,-1.0, 1.0,
 
-        1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f,
-        1.0f,-1.0f, 1.0f
+        1.0, 1.0, 1.0,
+        -1.0, 1.0, 1.0,
+        1.0,-1.0, 1.0,
+
     };
-    GLfloat normals[12] = {0};
 
-    int j = 0;
+    GLfloat colors[] =
+    {
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 0.0,
+
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 0.0,
+
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0
+    };
+
+    //GLfloat normals[12] = {0};
+
+    /*int j = 0;
     for(int i = 0; i < 12*3; i+=9)
     {
         QVector3D p1 = QVector3D(values[i], values[i+1], values[i+2]);
@@ -114,7 +173,7 @@ void Squircle::paint()
         normals[j++] = (GLfloat)n.x();
         normals[j++] = (GLfloat)n.y();
         normals[j++] = (GLfloat)n.z();
-    }
+    }*/
 
     if (!m_program)
     {
@@ -153,23 +212,29 @@ void Squircle::paint()
 
     glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
 
-    glClearColor(0, 0, 1, 1);
+    glClearColor(0., 0., 0., 1.);
 
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     m_program->setUniformValue("t", (float)m_thread_t);
     m_program->setUniformValue("mvpMatrix", pMatrix * vMatrix * mMatrix);
-    m_program->setUniformValue("color", QVector4D(1.0, 1.0, 1.0, 1.0));
+    //m_program->setUniformValue("color", QVector4D(1.0, 1.0, 1.0, 1.0));
 
-    m_program->setAttributeArray("normals", normals, 3);
-    m_program->enableAttributeArray("normals");
+    //m_program->setUniformValueArray("colors", colors, 3);
+
+    //m_program->setAttributeArray("normals", normals, 3);
+    //m_program->enableAttributeArray("normals");
 
     m_program->setAttributeArray("vertex", values, 3);
     m_program->enableAttributeArray("vertex");
 
+    m_program->setAttributeArray("in_color", colors, 3);
+    m_program->enableAttributeArray("colors");
+
     glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
-    m_program->disableAttributeArray("normals");
+    //m_program->disableAttributeArray("normals");
+    m_program->disableAttributeArray("colors");
     m_program->disableAttributeArray("vertex");
     m_program->release();
     //*/
