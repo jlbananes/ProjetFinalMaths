@@ -17,5 +17,8 @@ int main(int argc, char **argv)
     QObject::connect((QObject*)view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
 
     // LE commentaire de fou !!
+    // OUi bof
+    // c'est nul
+
     return app.exec();
 }
