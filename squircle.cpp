@@ -109,7 +109,7 @@ void Squircle::paint()
 
     };
 
-    GLfloat colors[] =
+    /*GLfloat colors[] =
     {
         1.0, 0.0, 0.0,
         1.0, 0.0, 0.0,
@@ -158,7 +158,7 @@ void Squircle::paint()
         0.0, 0.0, 1.0,
         0.0, 0.0, 1.0,
         0.0, 0.0, 1.0
-    };
+    };*/
 
     //GLfloat normals[12] = {0};
 
@@ -218,7 +218,7 @@ void Squircle::paint()
 
     m_program->setUniformValue("t", (float)m_thread_t);
     m_program->setUniformValue("mvpMatrix", pMatrix * vMatrix * mMatrix);
-    //m_program->setUniformValue("color", QVector4D(1.0, 1.0, 1.0, 1.0));
+    m_program->setUniformValue("color", QVector4D(1.0, 1.0, 0.0, 1.0));
 
     //m_program->setUniformValueArray("colors", colors, 3);
 
@@ -228,8 +228,8 @@ void Squircle::paint()
     m_program->setAttributeArray("vertex", vertices, 3);
     m_program->enableAttributeArray("vertex");
 
-    m_program->setAttributeArray("in_color", colors, 3);
-    m_program->enableAttributeArray("colors");
+    //m_program->setAttributeArray("in_color", colors, 3);
+    //m_program->enableAttributeArray("colors");
 
     glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
