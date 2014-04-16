@@ -1,3 +1,5 @@
+#version 330
+
 uniform mat4 mvpMatrix;
 uniform lowp float t;
 //uniform vec4 color;
@@ -7,7 +9,7 @@ uniform lowp float t;
 in vec3 in_color;
 in vec4 vertex;
 
-//varying vec3 color;
+out vec3 color;
 
 //float PI = 3.1415926535897932384626433832795;
 //lowp float a = PI/4;

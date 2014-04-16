@@ -3,8 +3,8 @@ import OpenGLUnderQML 1.0
 
 Item {
 
-    width: 1350
-    height: 690
+    width : 800
+    height : 600
 
     Squircle {
         id: squircle
