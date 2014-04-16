@@ -51,7 +51,7 @@ void Squircle::paint()
     GLint time;
     glGetIntegerv(GL_TIMESTAMP, &time);
     static const GLfloat lightpos[] = {.5, 1., 1., 0.};
-    GLfloat values[] =
+    GLfloat vertices[] =
     {
         // face x=-1
         -1.0,-1.0,-1.0, // triangle 1 : begin
@@ -225,7 +225,7 @@ void Squircle::paint()
     //m_program->setAttributeArray("normals", normals, 3);
     //m_program->enableAttributeArray("normals");
 
-    m_program->setAttributeArray("vertex", values, 3);
+    m_program->setAttributeArray("vertex", vertices, 3);
     m_program->enableAttributeArray("vertex");
 
     m_program->setAttributeArray("in_color", colors, 3);
@@ -240,7 +240,7 @@ void Squircle::paint()
     //*/
 }
 
-QVector3D Squircle::getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3)
+/*QVector3D Squircle::getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3)
 {
     QVector3D U = QVector3D(p2.x()-p1.x(), p2.y()-p1.y(), p2.z()-p1.z());
     QVector3D V = QVector3D(p3.x()-p1.x(), p3.y()-p1.y(), p3.z()-p1.z());
@@ -251,7 +251,7 @@ QVector3D Squircle::getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3)
     Normal.setZ((U.x()*V.y()) - (U.y()*V.z()));
 
     return Normal;
-}
+}*/
 
 void Squircle::cleanup()
 {

@@ -35,7 +35,7 @@ private slots:
 private:
     QOpenGLShaderProgram *m_program;
     QMatrix4x4 pMatrix;
-    QVector3D getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3);
+    //QVector3D getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3);
     qreal m_t;
     qreal m_thread_t;
 };
