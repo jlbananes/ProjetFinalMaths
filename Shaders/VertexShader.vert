@@ -4,7 +4,7 @@ uniform lowp float t;
 
 //varying highp vec2 coords;
 
-//in vec3 in_color;
+in vec3 in_color;
 in vec4 vertex;
 
 //varying vec3 color;
@@ -28,5 +28,5 @@ void main(void)
     mat4 rotationXY = rotationX * rotationY;
     gl_Position = mvpMatrix * rotationXY * vertex;
     //coords = vertex.xy;
-    //color = in_color;
+    color = in_color;
 }
