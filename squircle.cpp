@@ -69,6 +69,8 @@ void Squircle::paint()
     QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 5);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
     GLint time;
+
+
     glGetIntegerv(GL_TIMESTAMP, &time);
     static const GLfloat lightpos[] = {.5, 1., 1., 0.};
     GLfloat vertices[] =
@@ -163,13 +165,13 @@ void Squircle::paint()
         1.0, 1.0, 0.0,
         1.0, 1.0, 0.0,
 
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
 
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 1.0,
 
         1.0, 0.0, 1.0,
         1.0, 0.0, 1.0,

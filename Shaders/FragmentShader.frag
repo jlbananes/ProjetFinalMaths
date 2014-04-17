@@ -9,7 +9,7 @@
 //varying highp vec2 coords;
 
 //in vec4 varyingColor;
-in vec3 color;
+smooth in vec3 color;
 
 out vec4 out_color;
 
