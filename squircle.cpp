@@ -26,6 +26,26 @@ void Squircle::setT(qreal t)
         window()->update();
 }
 
+void Squircle::setX(qreal x)
+{
+    if(x==m_x)
+        return;
+    m_x = x;
+    emit xChanged();
+    if (window())
+        window()->update();
+}
+
+void Squircle::setY(qreal y)
+{
+    if(y==m_y)
+        return;
+    m_y = y;
+    emit yChanged();
+    if (window())
+        window()->update();
+}
+
 void Squircle::handleWindowChanged(QQuickWindow *win)
 {
     if (win) {
@@ -231,6 +251,8 @@ void Squircle::paint()
 
     glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
+    printf("x = %f y = %f", m_x, m_y);
+
     //m_program->disableAttributeArray("normals");
     m_program->disableAttributeArray("in_color");
     m_program->disableAttributeArray("vertex");
@@ -262,4 +284,6 @@ void Squircle::cleanup()
 void Squircle::sync()
 {
     m_thread_t = m_t;
+    m_thread_x = m_x;
+    m_thread_y = m_y;
 }

@@ -3,14 +3,16 @@ import OpenGLUnderQML 1.0
 
 Item {
 
-    width : 800
-    height : 600
+    width : 7680
+    height : 4320
 
     Squircle {
         id: squircle
         function update()
         {
             squircle.t += 1/600;
+            squircle.x = mouseNav.mouseX;
+            squircle.y = mouseNav.mouseY;
         }
     }
 
