@@ -9,14 +9,14 @@ Item {
     property int ymove: 0
     property int clickedButton: 0
 
-    Squircle {
-        id: squircle
+    Drawing {
+        id: drawing
         function update()
         {
-            //squircle.t += 1/600;
-            squircle.x = xmove;
-            squircle.y = ymove;
-            squircle.clickedButton = clickedButton;
+            //drawing.t += 1/600;
+            drawing.x = xmove;
+            drawing.y = ymove;
+            drawing.clickedButton = clickedButton;
         }
     }
 
@@ -28,7 +28,7 @@ Item {
         triggeredOnStart: true
         onTriggered:
         {
-            squircle.update();
+            drawing.update();
         }
     }
 

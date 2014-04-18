@@ -1,13 +1,13 @@
 #include <QGuiApplication>
 #include <QtQuick/QQuickView>
 
-#include "squircle.h"
+#include "drawing.h"
 
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<Squircle>("OpenGLUnderQML", 1, 0, "Squircle");
+    qmlRegisterType<Drawing>("OpenGLUnderQML", 1, 0, "Drawing");
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);
