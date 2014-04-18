@@ -5,14 +5,18 @@ Item {
 
     width : 7680
     height : 4320
+    property int xmove: 0
+    property int ymove: 0
+    property int clickedButton: 0
 
     Squircle {
         id: squircle
         function update()
         {
-            squircle.t += 1/600;
-            squircle.x = mouseNav.mouseX;
-            squircle.y = mouseNav.mouseY;
+            //squircle.t += 1/600;
+            squircle.x = xmove;
+            squircle.y = ymove;
+            squircle.clickedButton = clickedButton;
         }
     }
 
@@ -61,6 +65,24 @@ Item {
         id: mouseNav
         hoverEnabled: true
         anchors.fill: parent
-        onPositionChanged: { label.text = " X: " + mouseX + " Y: " + mouseY; }
+        property int clickedX: 0
+        property int clickedY: 0
+
+        onPositionChanged: {
+            if (clickedButton == 1)
+            {
+                xmove = mouseX - clickedX;
+                ymove = -(mouseY - clickedY);
+
+                label.text = "déplacement en X :" + xmove + "  déplacement en y : " + ymove;
+            }
+
+            else
+            {
+                label.text = " X: " + mouseX + " Y: " + mouseY;
+            }
+        }
+        onPressed: {label.text = "clic souris"; clickedButton = !clickedButton; clickedX = mouseX; clickedY = mouseY; }
+        onReleased: {clickedButton = 0;}
     }
 }

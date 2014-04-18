@@ -14,6 +14,10 @@ Squircle::Squircle()
     , m_thread_t(0)
 {
     connect(this, SIGNAL(windowChanged(QQuickWindow*)), this, SLOT(handleWindowChanged(QQuickWindow*)));
+    totalRotationMatrix.setToIdentity();
+    currentRotationMatrix.setToIdentity();
+    tempXmove = 0;
+    tempYmove = 0;
 }
 
 void Squircle::setT(qreal t)
@@ -46,6 +50,68 @@ void Squircle::setY(qreal y)
         window()->update();
 }
 
+void Squircle::setClickedButton(qreal c)
+{
+    if (c == m_clickedButton)
+        return;
+    m_clickedButton = c;
+    emit clickedButtonChanged();
+    if (window())
+        window()->update();
+}
+
+QMatrix4x4 Squircle::rotateCamera(QVector3D cameraPosition, QVector3D cameraUpDirection, int nbPixelsX, int nbPixelsY)
+{
+    QMatrix4x4 rotationMatrix;
+    rotationMatrix.setToIdentity();
+
+    float Yangle = atan2(nbPixelsX/20.,cameraPosition.length());
+
+    float c = cos(Yangle);  float s = sin(Yangle);  float C = 1-c;
+    float x = cameraUpDirection.x();
+    float y = cameraUpDirection.y();
+    float z = cameraUpDirection.z();
+
+    float xs = x*s;   float ys = y*s;   float zs = z*s;
+    float xC = x*C;   float yC = y*C;   float zC = z*C;
+    float xyC = x*yC; float yzC = y*zC; float zxC = z*xC;
+
+    // matrice de rotation autour de l'axe Y de l'écran (vertical)
+    QMatrix4x4 rotationMatrixY = QMatrix4x4(x*xC+c,    xyC-zs, zxC+ys,     0.0,
+                                 xyC+zs,    y*yC+c, yzC-xs,     0.0,
+                                 zxC-ys,    yzC+xs, z*zC+c ,    0.0,
+                                 0.0,       0.0,    0.0,        1.0);
+
+
+    /*c = cos(θ); s = sin(θ); C = 1-c
+    xs = x*s;   ys = y*s;   zs = z*s
+    xC = x*C;   yC = y*C;   zC = z*C
+    xyC = x*yC; yzC = y*zC; zxC = z*xC
+    [ x*xC+c   xyC-zs   zxC+ys ]
+    [ xyC+zs   y*yC+c   yzC-xs ]
+    [ zxC-ys   yzC+xs   z*zC+c ]*/
+
+
+    float Xangle = atan2(nbPixelsY/20.,cameraPosition.length());
+    c = cos(Xangle);  s = sin(Xangle);  C = 1-c;
+    QVector3D horizontalAxis = QVector3D::crossProduct(cameraPosition,cameraUpDirection);
+    /*x = horizontalAxis.x();
+    y = horizontalAxis.y();
+    z = horizontalAxis.z();*/
+    x = -1; y=0; z=0;
+    xs = x*s;    ys = y*s;    zs = z*s;
+    xC = x*C;    yC = y*C;    zC = z*C;
+    xyC = x*yC;  yzC = y*zC;  zxC = z*xC;
+
+    // matrice de rotation autour de l'axe X de l'écran (horizontal)
+    QMatrix4x4 rotationMatrixX = QMatrix4x4(x*xC+c,    xyC-zs, zxC+ys,     0.0,
+                                 xyC+zs,    y*yC+c, yzC-xs,     0.0,
+                                 zxC-ys,    yzC+xs, z*zC+c ,    0.0,
+                                 0.0,       0.0,    0.0,        1.0);
+
+    return rotationMatrix * rotationMatrixY * rotationMatrixX;
+}
+
 void Squircle::handleWindowChanged(QQuickWindow *win)
 {
     if (win) {
@@ -68,8 +134,8 @@ void Squircle::paint()
     QMatrix4x4 cameraTransformation;
     QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 5);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
-    GLint time;
 
+    GLint time;
 
     glGetIntegerv(GL_TIMESTAMP, &time);
     static const GLfloat lightpos[] = {.5, 1., 1., 0.};
@@ -149,13 +215,13 @@ void Squircle::paint()
         0.0, 1.0, 0.0,
         0.0, 1.0, 0.0,
 
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
 
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0,
 
         1.0, 1.0, 0.0,
         1.0, 1.0, 0.0,
@@ -215,13 +281,28 @@ void Squircle::paint()
 
     //Resize
     pMatrix.setToIdentity();
-
     vMatrix.lookAt(cameraPosition, QVector3D(0, 0, 0), cameraUpDirection);
+
+    //QMatrix4x4 newRotationMatrix;
+    if (m_x!=currentXmove || m_y!=currentYmove)
+    {
+        printf("clic !!\n");
+        currentRotationMatrix = rotateCamera(cameraPosition, cameraUpDirection, m_x, m_y);
+        currentXmove = m_x;
+        currentYmove = m_y;
+    }
+    else //if (clic relaché)
+    {
+        totalRotationMatrix = totalRotationMatrix * currentRotationMatrix;
+        currentRotationMatrix.setToIdentity();
+    }
+    vMatrix = vMatrix * totalRotationMatrix * currentRotationMatrix;
 
     qreal ratio = window()->devicePixelRatio();
     int w = int(ratio * window()->width());
     int h = int(ratio * window()->height());
     pMatrix.perspective(60.0, (double) w / (double) h, 0.001, 1000);
+
     glViewport(0, 0, w, h);
 
     glMatrixMode(GL_PROJECTION|GL_MODELVIEW);
@@ -253,7 +334,7 @@ void Squircle::paint()
 
     glDrawArrays(GL_TRIANGLES, 0, 12*3);
 
-    printf("x = %f y = %f", m_x, m_y);
+    //printf("x = %f y = %f", m_x, m_y);
 
     //m_program->disableAttributeArray("normals");
     m_program->disableAttributeArray("in_color");
@@ -283,9 +364,15 @@ void Squircle::cleanup()
     }
 }
 
+void Squircle::meuh()
+{
+    return;
+}
+
 void Squircle::sync()
 {
     m_thread_t = m_t;
     m_thread_x = m_x;
     m_thread_y = m_y;
+    m_thread_clickedButton = m_clickedButton;
 }
