@@ -1,8 +1,11 @@
-#include "drawing.h"
-
 #include <QtQuick/qquickwindow.h>
-#include <QtGui/QOpenGLShaderProgram>
-#include <QtGui/QOpenGLContext>
+#include <QOpenGLContext>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <iostream>
+
+#include "drawing.h"
 
 #define highp
 #define mediump
@@ -18,6 +21,36 @@ Drawing::Drawing()
     currentRotationMatrix.setToIdentity();
     tempXmove = 0;
     tempYmove = 0;
+
+    // Tell Qt we will use OpenGL for this window
+    //setSurfaceType( OpenGLSurface );
+
+    // Specify the format and create platform-specific surface
+    QSurfaceFormat format;
+    format.setDepthBufferSize( 24 );
+    format.setMajorVersion( 4 );
+    format.setMinorVersion( 3 );
+    format.setSamples( 4 );
+    format.setProfile( QSurfaceFormat::CoreProfile );
+    //setFormat( format );
+    //create();
+
+    // Create an OpenGL context
+    m_context = new QOpenGLContext;
+    m_context->setFormat( format );
+    m_context->create();
+
+    // Make the context current on this window
+    //m_context->makeCurrent( this );
+
+    // Obtain a functions object and resolve all entry points
+    // m_funcs is declared as: QOpenGLFunctions_4_3_Core* m_funcs
+    m_funcs = dynamic_cast<QOpenGLFunctions_4_3_Core*>(m_context->versionFunctions());
+    if ( !m_funcs ) {
+        qWarning( "Could not obtain OpenGL versions object" );
+        exit( 1 );
+    }
+    m_funcs->initializeOpenGLFunctions();
 }
 
 void Drawing::setT(qreal t)
@@ -94,10 +127,10 @@ QMatrix4x4 Drawing::rotateCamera(QVector3D cameraPosition, QVector3D cameraUpDir
 
     float Xangle = atan2(nbPixelsY/20.,cameraPosition.length());
     c = cos(Xangle);  s = sin(Xangle);  C = 1-c;
-    QVector3D horizontalAxis = QVector3D::crossProduct(cameraPosition,cameraUpDirection);
-    /*x = horizontalAxis.x();
+    QVector3D horizontalAxis = QVector3D(1.0,.0,.0); //::crossProduct(cameraPosition,cameraUpDirection);
+    x = horizontalAxis.x();
     y = horizontalAxis.y();
-    z = horizontalAxis.z();*/
+    z = horizontalAxis.z();
     x = -1; y=0; z=0;
     xs = x*s;    ys = y*s;    zs = z*s;
     xC = x*C;    yC = y*C;    zC = z*C;
@@ -129,16 +162,17 @@ void Drawing::handleWindowChanged(QQuickWindow *win)
 
 void Drawing::paint()
 {
+
     QMatrix4x4 mMatrix;
     QMatrix4x4 vMatrix;
     QMatrix4x4 cameraTransformation;
     QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 5);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
-
     GLint time;
 
     glGetIntegerv(GL_TIMESTAMP, &time);
     static const GLfloat lightpos[] = {.5, 1., 1., 0.};
+
     GLfloat vertices[] =
     {
         // face x=-1
@@ -194,7 +228,6 @@ void Drawing::paint()
         1.0, 1.0, 1.0,
         -1.0, 1.0, 1.0,
         1.0,-1.0, 1.0,
-
     };
 
     GLfloat colors[] =
@@ -249,7 +282,6 @@ void Drawing::paint()
     };
 
     //GLfloat normals[12] = {0};
-
     /*int j = 0;
     for(int i = 0; i < 12*3; i+=9)
     {
@@ -263,22 +295,6 @@ void Drawing::paint()
         normals[j++] = (GLfloat)n.z();
     }*/
 
-    if (!m_program)
-    {
-        /* D:\\Workspace */
-        m_program = new QOpenGLShaderProgram();
-        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "..\\..\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
-        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "..\\..\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
-        m_program->bindAttributeLocation("gl_Vertex", 0);
-        m_program->link();
-
-        connect(window()->openglContext(), SIGNAL(aboutToBeDestroyed()), this, SLOT(cleanup()), Qt::DirectConnection);
-    }
-
-    m_program->bind();
-
-    m_program->enableAttributeArray(0);
-
     //Resize
     pMatrix.setToIdentity();
     vMatrix.lookAt(cameraPosition, QVector3D(0, 0, 0), cameraUpDirection);
@@ -286,7 +302,7 @@ void Drawing::paint()
     //QMatrix4x4 newRotationMatrix;
     if (m_x!=currentXmove || m_y!=currentYmove)
     {
-        printf("clic !!\n");
+        //printf("clic !!\n");
         currentRotationMatrix = rotateCamera(cameraPosition, cameraUpDirection, m_x, m_y);
         currentXmove = m_x;
         currentYmove = m_y;
@@ -303,44 +319,87 @@ void Drawing::paint()
     int h = int(ratio * window()->height());
     pMatrix.perspective(60.0, (double) w / (double) h, 0.001, 1000);
 
+    //glOrtho(-5.,5.,-5.,5.,.1,10.);
     glViewport(0, 0, w, h);
-
     glMatrixMode(GL_PROJECTION|GL_MODELVIEW);
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glDisable(GL_BLEND);
-
     glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-
     glClearColor(0., 0., 0., 1.);
-
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+    // création du VAO
+    QOpenGLVertexArrayObject* m_vao0 = new QOpenGLVertexArrayObject(this);
+    m_vao0->create();
+    m_vao0->bind();
+
+
+    // initialisation des VBO
+    QOpenGLBuffer m_positionBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+
+    // VBO pour les vertices
+    m_positionBuffer.create();
+    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_positionBuffer.bind();
+    m_positionBuffer.allocate( &vertices, 12*3*sizeof(float) );
+    m_positionBuffer.release();
+
+    // VBO pour les couleurs
+    m_colorBuffer.create();
+    m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_colorBuffer.bind();
+    m_colorBuffer.allocate( &colors, 12 * 3 * sizeof( float ) );
+    m_colorBuffer.release();
+
+    if (!m_program)
+    {
+        /* D:\\Workspace */
+        m_program = new QOpenGLShaderProgram();
+        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "..\\..\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "..\\..\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
+        m_program->bindAttributeLocation("gl_Vertex", 0);
+        m_program->link();
+
+        connect(window()->openglContext(), SIGNAL(aboutToBeDestroyed()), this, SLOT(cleanup()), Qt::DirectConnection);
+    }
+
+    m_program->bind();
+    m_program->enableAttributeArray(0);
     m_program->setUniformValue("t", (float)m_thread_t);
     m_program->setUniformValue("mvpMatrix", pMatrix * vMatrix * mMatrix);
-    //m_program->setUniformValue("color", QVector4D(1.0, 1.0, 0.0, 1.0));
 
+    //m_program->setUniformValue("color", QVector4D(1.0, 1.0, 0.0, 1.0));
     //m_program->setAttributeArray("normals", normals, 3);
     //m_program->enableAttributeArray("normals");
 
-    m_program->setAttributeArray("vertex", vertices, 3);
-    m_program->enableAttributeArray("vertex");
+    m_vao0->bind();
+    m_funcs->glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT, &m_positionBuffer);
 
-    m_program->setAttributeArray("in_color", colors, 3);
-    m_program->enableAttributeArray("in_color");
+    //m_program->setAttributeArray("vertex", vertices, 3);
+    //m_program->enableAttributeArray("vertex");
+    //m_program->setAttributeBuffer( "vertex", GL_FLOAT, 0, 3 );
 
-    glDrawArrays(GL_TRIANGLES, 0, 12*3);
+
+    //m_program->setAttributeArray("in_color", colors, 3);
+    //m_program->enableAttributeArray("in_color");
+    //m_program->setAttributeBuffer( "in_color", GL_FLOAT, 12*3*sizeof(GL_FLOAT), 3 );
+
+
+    //glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //printf("x = %f y = %f", m_x, m_y);
-
     //m_program->disableAttributeArray("normals");
-    m_program->disableAttributeArray("in_color");
-    m_program->disableAttributeArray("vertex");
+    //m_program->disableAttributeArray("in_color");
+    //m_program->disableAttributeArray("vertex");
+    m_vao0->release();
     m_program->release();
-    //*/
+
+    //m_vao0->release();
+
 }
 
 /*QVector3D Drawing::getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3)
@@ -362,11 +421,6 @@ void Drawing::cleanup()
         delete m_program;
         m_program = 0;
     }
-}
-
-void Drawing::meuh()
-{
-    return;
 }
 
 void Drawing::sync()

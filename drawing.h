@@ -8,6 +8,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include <QtCore/qhash.h>
+#include <QtCore/qpair.h>
+#include <QtGui/qopengl.h>
+#include <QOpenGLFunctions_4_3_Core>
+
 class Drawing : public QQuickItem
 {
     Q_OBJECT
@@ -30,6 +35,11 @@ public:
     void setY(qreal y);
     void setClickedButton(qreal clickedButton);
 
+    QOpenGLContext* m_context;
+    QOpenGLFunctions_4_3_Core* m_funcs;
+    //QAbstractOpenGLFunctions* m_funcs;
+
+
 signals:
     void tChanged();
     void xChanged();
@@ -41,7 +51,6 @@ public slots:
     void paint();
     void cleanup();
     void sync();
-    void meuh();
 
 private slots:
     void handleWindowChanged(QQuickWindow *win);
