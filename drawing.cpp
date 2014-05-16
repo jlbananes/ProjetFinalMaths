@@ -1,10 +1,3 @@
-#include <QtQuick/qquickwindow.h>
-#include <QOpenGLContext>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject>
-#include <iostream>
-
 #include "drawing.h"
 
 #define highp
@@ -22,35 +15,12 @@ Drawing::Drawing()
     tempXmove = 0;
     tempYmove = 0;
 
-    // Tell Qt we will use OpenGL for this window
-    //setSurfaceType( OpenGLSurface );
-
-    // Specify the format and create platform-specific surface
-    QSurfaceFormat format;
-    format.setDepthBufferSize( 24 );
-    format.setMajorVersion( 4 );
-    format.setMinorVersion( 3 );
-    format.setSamples( 4 );
-    format.setProfile( QSurfaceFormat::CoreProfile );
-    //setFormat( format );
-    //create();
-
     // Create an OpenGL context
     m_context = new QOpenGLContext;
-    m_context->setFormat( format );
     m_context->create();
 
     // Make the context current on this window
     //m_context->makeCurrent( this );
-
-    // Obtain a functions object and resolve all entry points
-    // m_funcs is declared as: QOpenGLFunctions_4_3_Core* m_funcs
-    m_funcs = dynamic_cast<QOpenGLFunctions_4_3_Core*>(m_context->versionFunctions());
-    if ( !m_funcs ) {
-        qWarning( "Could not obtain OpenGL versions object" );
-        exit( 1 );
-    }
-    m_funcs->initializeOpenGLFunctions();
 }
 
 void Drawing::setT(qreal t)
@@ -331,30 +301,6 @@ void Drawing::paint()
     glClearColor(0., 0., 0., 1.);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    // création du VAO
-    QOpenGLVertexArrayObject* m_vao0 = new QOpenGLVertexArrayObject(this);
-    m_vao0->create();
-    m_vao0->bind();
-
-
-    // initialisation des VBO
-    QOpenGLBuffer m_positionBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-
-    // VBO pour les vertices
-    m_positionBuffer.create();
-    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_positionBuffer.bind();
-    m_positionBuffer.allocate( &vertices, 12*3*sizeof(float) );
-    m_positionBuffer.release();
-
-    // VBO pour les couleurs
-    m_colorBuffer.create();
-    m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_colorBuffer.bind();
-    m_colorBuffer.allocate( &colors, 12 * 3 * sizeof( float ) );
-    m_colorBuffer.release();
-
     if (!m_program)
     {
         /* D:\\Workspace */
@@ -366,18 +312,45 @@ void Drawing::paint()
 
         connect(window()->openglContext(), SIGNAL(aboutToBeDestroyed()), this, SLOT(cleanup()), Qt::DirectConnection);
     }
-
     m_program->bind();
-    m_program->enableAttributeArray(0);
+    //m_program->enableAttributeArray(0);
     m_program->setUniformValue("t", (float)m_thread_t);
     m_program->setUniformValue("mvpMatrix", pMatrix * vMatrix * mMatrix);
+
+    // création du VAO
+    QOpenGLVertexArrayObject* m_vao0 = new QOpenGLVertexArrayObject(this);
+    m_vao0->create();
+    m_vao0->bind();
+
+    // initialisation des VBO
+    QOpenGLBuffer m_positionBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+
+    // VBO pour les vertices
+    m_positionBuffer.create();
+    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StreamDraw );
+    m_positionBuffer.bind();
+    m_positionBuffer.allocate( &vertices, 12 * 3 * 3 * sizeof(GLfloat) );
+
+    m_program->enableAttributeArray("vertex");
+    m_program->setAttributeBuffer("vertex", GL_FLOAT, 0, 3);
+
+    // VBO pour les couleurs
+    m_colorBuffer.create();
+    m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_colorBuffer.bind();
+    m_colorBuffer.allocate( &colors, 12 * 3 * 3 * sizeof( GLfloat ) );
+
+    m_program->enableAttributeArray("in_color");
+    m_program->setAttributeBuffer("in_color", GL_FLOAT ,0, 3);
 
     //m_program->setUniformValue("color", QVector4D(1.0, 1.0, 0.0, 1.0));
     //m_program->setAttributeArray("normals", normals, 3);
     //m_program->enableAttributeArray("normals");
 
     m_vao0->bind();
-    m_funcs->glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_INT, &m_positionBuffer);
+    //glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
+    glDrawArrays(GL_TRIANGLES, 0,36);
 
     //m_program->setAttributeArray("vertex", vertices, 3);
     //m_program->enableAttributeArray("vertex");
@@ -389,7 +362,7 @@ void Drawing::paint()
     //m_program->setAttributeBuffer( "in_color", GL_FLOAT, 12*3*sizeof(GL_FLOAT), 3 );
 
 
-    //glDrawArrays(GL_TRIANGLES, 0, 36);
+    //glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
     //printf("x = %f y = %f", m_x, m_y);
     //m_program->disableAttributeArray("normals");

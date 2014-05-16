@@ -1,6 +1,13 @@
 #ifndef DRAWING_H
 #define DRAWING_H
 
+#include <QtQuick/qquickwindow.h>
+#include <QOpenGLContext>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <iostream>
+
 #include <QtQuick/QQuickItem>
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtOpenGL>
