@@ -1,7 +1,6 @@
 #ifndef DRAWING_H
 #define DRAWING_H
 
-#include <vector>
 #include <QtQuick/QQuickItem>
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtOpenGL>
@@ -9,7 +8,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-using namespace std;
+#include <QtCore/qhash.h>
+#include <QtCore/qpair.h>
+#include <QtGui/qopengl.h>
+#include <QOpenGLFunctions_4_3_Core>
 
 class Drawing : public QQuickItem
 {
@@ -32,6 +34,11 @@ public:
     void setX(qreal x);
     void setY(qreal y);
     void setClickedButton(qreal clickedButton);
+
+    QOpenGLContext* m_context;
+    QOpenGLFunctions_4_3_Core* m_funcs;
+    //QAbstractOpenGLFunctions* m_funcs;
+
 
 signals:
     void tChanged();
