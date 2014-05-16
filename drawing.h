@@ -1,12 +1,15 @@
 #ifndef DRAWING_H
 #define DRAWING_H
 
+#include <vector>
 #include <QtQuick/QQuickItem>
 #include <QtGui/QOpenGLShaderProgram>
 #include <QtOpenGL>
 #include <math.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+using namespace std;
 
 class Drawing : public QQuickItem
 {
@@ -41,7 +44,6 @@ public slots:
     void paint();
     void cleanup();
     void sync();
-    void meuh();
 
 private slots:
     void handleWindowChanged(QQuickWindow *win);

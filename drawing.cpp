@@ -1,4 +1,5 @@
 #include "drawing.h"
+#include "importmesh.h"
 
 #include <QtQuick/qquickwindow.h>
 #include <QtGui/QOpenGLShaderProgram>
@@ -129,10 +130,19 @@ void Drawing::handleWindowChanged(QQuickWindow *win)
 
 void Drawing::paint()
 {
+    vector<QVector3D> d_vertices;
+    vector<QVector2D> d_uvs;
+    vector<QVector3D> d_normals;
+    importMesh im;
+    im.import("D:\\Workspace\\ProjetFinalMaths\\Assets\\Bugatti-Veyron\\Bugatti-Veyron 3D models\\Bugatti-Veyron.obj",
+              d_vertices,
+              d_uvs,
+              d_normals);
+
     QMatrix4x4 mMatrix;
     QMatrix4x4 vMatrix;
     QMatrix4x4 cameraTransformation;
-    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 5);
+    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 50);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
 
     GLint time;
@@ -326,13 +336,13 @@ void Drawing::paint()
     //m_program->setAttributeArray("normals", normals, 3);
     //m_program->enableAttributeArray("normals");
 
-    m_program->setAttributeArray("vertex", vertices, 3);
+    m_program->setAttributeArray("vertex", d_vertices.data());
     m_program->enableAttributeArray("vertex");
 
-    m_program->setAttributeArray("in_color", colors, 3);
+    m_program->setAttributeArray("in_color", d_normals.data());
     m_program->enableAttributeArray("in_color");
 
-    glDrawArrays(GL_TRIANGLES, 0, 12*3);
+    glDrawArrays(GL_TRIANGLES, 0, d_vertices.size()*3);
 
     //printf("x = %f y = %f", m_x, m_y);
 
@@ -362,11 +372,6 @@ void Drawing::cleanup()
         delete m_program;
         m_program = 0;
     }
-}
-
-void Drawing::meuh()
-{
-    return;
 }
 
 void Drawing::sync()
