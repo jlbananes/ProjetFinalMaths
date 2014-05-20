@@ -325,6 +325,8 @@ void Drawing::paint()
     // initialisation des VBO
     QOpenGLBuffer m_positionBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer m_positionIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
+    QOpenGLBuffer m_colorIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
 
     // VBO pour les vertices
     m_positionBuffer.create();
@@ -349,8 +351,17 @@ void Drawing::paint()
     //m_program->enableAttributeArray("normals");
 
     m_vao0->bind();
-    //glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
-    glDrawArrays(GL_TRIANGLES, 0,36);
+    //Initialize IBO
+    m_indexBuffer.allocate(&m_positionBuffer, 1);
+    m_indexBuffer.bind();
+    m_indexBuffer.
+    glBindBuffer(GL_ARRAY_BUFFER, m_positionBuffer);
+    glBufferData(GL_ARRAY_BUFFER, 12*3*3*sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    //Draw the cube
+    glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
+    //glDrawArrays(GL_TRIANGLES, 0,36);
 
     //m_program->setAttributeArray("vertex", vertices, 3);
     //m_program->enableAttributeArray("vertex");
