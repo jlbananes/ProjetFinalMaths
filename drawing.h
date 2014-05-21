@@ -1,24 +1,27 @@
 #ifndef DRAWING_H
 #define DRAWING_H
 
+#include <math.h>
+#include <iostream>
+
 #include <QtQuick/qquickwindow.h>
+#include <QtQuick/QQuickItem>
+#include <QtCore/qhash.h>
+#include <QtCore/qpair.h>
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#include <QtOpenGL>
+#include <QtGui/QOpenGLShaderProgram>
+#include <QtGui/qopengl.h>
+
 #include <QOpenGLContext>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
-#include <iostream>
-
-#include <QtQuick/QQuickItem>
-#include <QtGui/QOpenGLShaderProgram>
-#include <QtOpenGL>
-#include <math.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#include <QtCore/qhash.h>
-#include <QtCore/qpair.h>
-#include <QtGui/qopengl.h>
 #include <QOpenGLFunctions_4_3_Core>
+#include <QOpenGLFunctions>
 
 class Drawing : public QQuickItem
 {
@@ -44,6 +47,7 @@ public:
 
     QOpenGLContext* m_context;
     QOpenGLFunctions_4_3_Core* m_funcs;
+    QOpenGLFunctions* m_glFuncs;
     //QAbstractOpenGLFunctions* m_funcs;
 
 

@@ -272,75 +272,46 @@ void Drawing::paint()
     // initialisation des VBO
     QOpenGLBuffer m_positionBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-<<<<<<< HEAD
-=======
-    // initialisation des IBO
->>>>>>> 53562e9a3f06862eb8a3978bdbd0dfb518d7e445
     QOpenGLBuffer m_positionIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
     QOpenGLBuffer m_colorIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
 
     // VBO pour les vertices
     m_positionBuffer.create();
-    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StreamDraw );
     m_positionBuffer.bind();
-    m_positionBuffer.allocate( &vertices, 12 * 3 * 3 * sizeof(GLfloat) );
+    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StreamDraw );
+    m_positionBuffer.allocate( &vertices, 8 * 3 * sizeof(GLfloat) );
 
     m_program->enableAttributeArray("vertex");
     m_program->setAttributeBuffer("vertex", GL_FLOAT, 0, 3);
+
+    m_positionIndexBuffer.create();
+    m_positionIndexBuffer.setUsagePattern( QOpenGLBuffer::StreamDraw );
+    m_positionIndexBuffer.bind();
+    m_positionIndexBuffer.allocate( &verticesIndex, 12 * 3 * sizeof(GLfloat));
+
+
 
     // VBO pour les couleurs
     m_colorBuffer.create();
     m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_colorBuffer.bind();
-    m_colorBuffer.allocate( &colors, 12 * 3 * 3 * sizeof( GLfloat ) );
+    m_colorBuffer.allocate( &colors, 6 * 3 * sizeof( GLfloat ) );
 
-    m_program->enableAttributeArray("in_color");
-    m_program->setAttributeBuffer("in_color", GL_FLOAT ,0, 3);
 
-    //m_program->setUniformValue("color", QVector4D(1.0, 1.0, 0.0, 1.0));
-    //m_program->setAttributeArray("normals", normals, 3);
-    //m_program->enableAttributeArray("normals");
+
+    m_colorIndexBuffer.create();
+    m_colorIndexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_colorIndexBuffer.bind();
+    m_colorIndexBuffer.allocate( &colorsIndex, 12 * 3 * sizeof( GLfloat ) );
 
     m_vao0->bind();
-<<<<<<< HEAD
-    //Initialize IBO
-    m_indexBuffer.allocate(&m_positionBuffer, 1);
-    m_indexBuffer.bind();
-    m_indexBuffer.
-    glBindBuffer(GL_ARRAY_BUFFER, m_positionBuffer);
-    glBufferData(GL_ARRAY_BUFFER, 12*3*3*sizeof(GLfloat), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    //Draw the cube
-    glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
-    //glDrawArrays(GL_TRIANGLES, 0,36);
-=======
-    //glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
-    glDrawArrays(GL_TRIANGLES, 0,36);
-    //glDrawElements(GL_TRIANGLES,0,12);
->>>>>>> 53562e9a3f06862eb8a3978bdbd0dfb518d7e445
-
-    //m_program->setAttributeArray("vertex", vertices, 3);
-    //m_program->enableAttributeArray("vertex");
-    //m_program->setAttributeBuffer( "vertex", GL_FLOAT, 0, 3 );
-
-
-    //m_program->setAttributeArray("in_color", colors, 3);
-    //m_program->enableAttributeArray("in_color");
-    //m_program->setAttributeBuffer( "in_color", GL_FLOAT, 12*3*sizeof(GL_FLOAT), 3 );
-
-
+    glDrawElements(GL_TRIANGLES, 12*3, GL_UNSIGNED_INT, 0);
+    std::cout << glGetError() << std::endl;
     //glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
-    //printf("x = %f y = %f", m_x, m_y);
-    //m_program->disableAttributeArray("normals");
-    //m_program->disableAttributeArray("in_color");
-    //m_program->disableAttributeArray("vertex");
     m_vao0->release();
     m_program->release();
-
-    //m_vao0->release();
-
 }
 
 /*QVector3D Drawing::getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3)
