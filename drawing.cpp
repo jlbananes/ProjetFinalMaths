@@ -145,7 +145,8 @@ void Drawing::paint()
 
     // tableau des vertices distincts
     GLfloat vertices[] =
-    {
+    {  
+        /*
         -1.0,-1.0,-1.0, // vertex 0
         -1.0,-1.0, 1.0, // vertex 1
         -1.0, 1.0, 1.0, // vertex 2
@@ -154,20 +155,86 @@ void Drawing::paint()
         1.0,-1.0,-1.0,  // vertex 5
         1.0, 1.0,-1.0,  // vertex 6
         1.0, 1.0, 1.0,  // vertex 7
+        */
 
-        -1.0,-1.0,-1.0, // couleur 0
-        -1.0,-1.0, 1.0, // couleur 1
-        -1.0, 1.0, 1.0, // couleur 2
-        -1.0, 1.0,-1.0, // couleur 3
-        1.0,-1.0, 1.0,  // couleur 4
-        1.0,-1.0,-1.0,  // couleur 5
-        1.0, 1.0,-1.0,  // couleur 6
-        1.0, 1.0, 1.0,  // couleur 7
+        -1.0,-1.0,-1.0, // vertex 0     // face (x=-1)
+        -1.0,-1.0, 1.0, // vertex 1
+        -1.0, 1.0, 1.0, // vertex 2
+        -1.0, 1.0,-1.0, // vertex 3
+
+        1.0,-1.0, 1.0,  // vertex 4     //face (y=-1)
+        -1.0,-1.0,-1.0, // vertex 0
+        1.0,-1.0,-1.0,  // vertex 5
+        -1.0,-1.0, 1.0, // vertex 1
+
+        1.0, 1.0,-1.0,  // vertex 6     //face (z=-1)
+        -1.0,-1.0,-1.0, // vertex 0
+        -1.0, 1.0,-1.0, // vertex 3
+        1.0,-1.0,-1.0,  // vertex 5
+
+        1.0, 1.0, 1.0,  // vertex 7     //face (x=1)
+        1.0,-1.0,-1.0,  // vertex 5
+        1.0, 1.0,-1.0,  // vertex 6
+        1.0,-1.0, 1.0,  // vertex 4
+
+        1.0, 1.0, 1.0,  // vertex 7     //face (y=1)
+        1.0, 1.0,-1.0,  // vertex 6
+        -1.0, 1.0,-1.0, // vertex 3
+        -1.0, 1.0, 1.0, // vertex 2
+
+        -1.0, 1.0, 1.0, // vertex 2     //face (z=1)
+        -1.0,-1.0, 1.0, // vertex 1
+        1.0, 1.0, 1.0,  // vertex 7
+        1.0,-1.0, 1.0,  // vertex 4
+
+
+        1.0,0.0,0.0,1.0, // couleur 0 (rouge)
+        1.0,0.0,0.0,1.0,
+        1.0,0.0,0.0,1.0,
+        1.0,0.0,0.0,1.0,
+
+        0.0,0.0,1.0,1.0, // couleur 1 (bleu)
+        0.0,0.0,1.0,1.0,
+        0.0,0.0,1.0,1.0,
+        0.0,0.0,1.0,1.0,
+
+        0.0,1.0,0.0,1.0, // couleur 2 (vert)
+        0.0,1.0,0.0,1.0,
+        0.0,1.0,0.0,1.0,
+        0.0,1.0,0.0,1.0,
+
+        1.0,1.0,0.0,1.0, // couleur 3 (jaune)
+        1.0,1.0,0.0,1.0,
+        1.0,1.0,0.0,1.0,
+        1.0,1.0,0.0,1.0,
+
+        1.0,0.0,1.0,1.0,  // couleur 4 (magenta)
+        1.0,0.0,1.0,1.0,
+        1.0,0.0,1.0,1.0,
+        1.0,0.0,1.0,1.0,
+
+        0.0,1.0,1.0,1.0,  // couleur 5 (cyan)
+        0.0,1.0,1.0,1.0,
+        0.0,1.0,1.0,1.0,
+        0.0,1.0,1.0,1.0
     };
 
-    GLint indexes[] =
+    GLushort indexes[] =
     {
-        0,1,2,  // facette 0 (x=-1)
+        0,1,2,      // face (x=-1)
+        0,2,3,
+        4,5,6,      // face (y=-1)
+        4,7,5,
+        8,9,10,     // face (z=-1)
+        8,11,9,
+        12,13,14,   // face (x=1)
+        13,12,15,
+        16,17,18,   // face (y=1)
+        16,18,19,
+        20,21,22,   // face (z=1)
+        22,21,23
+
+        /*0,1,2,  // facette 0 (x=-1)
         0,2,3,  // facette 1
         4,0,5,  // facette 2 (y=-1)
         4,1,0,  // facette 3
@@ -178,69 +245,15 @@ void Drawing::paint()
         7,6,3,  // facette 8 (y=1)
         7,3,2,  // facette 9
         2,1,7,  // facette 10 (z=1)
-        7,1,4   // facette 11
+        7,1,4   // facette 11*/
     };
 
     /*GLfloat colors[] =
     {
-        1.0, 0.0, 0.0,  // couleur 0 (rouge)
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 0.0,
 
-        0.0, 1.0, 0.0,  // couleur 1 (vert)
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 0.0,
 
-        0.0, 0.0, 1.0,  // couleur 2 (bleu)
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0,
-
-        0.0, 1.0, 1.0,  // couleur 3 (cyan)
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
-        0.0, 1.0, 1.0,
-
-        1.0, 0.0, 1.0,  // couleur 4 (magenta)
-        1.0, 0.0, 1.0,
-        1.0, 0.0, 1.0,
-        1.0, 0.0, 1.0,
-        1.0, 0.0, 1.0,
-        1.0, 0.0, 1.0,
-
-        1.0, 1.0, 0.0,  // couleur 5 (jaune)
-        1.0, 1.0, 0.0,
-        1.0, 1.0, 0.0,
-        1.0, 1.0, 0.0,
-        1.0, 1.0, 0.0,
-        1.0, 1.0, 0.0,
     };*/
 
-    /*GLint colorsIndex[] =
-    {
-        0,0,0,  // facette 0 (x=-1)
-        0,0,0,  // facette 1
-        1,1,1,  // facette 2 (y=-1)
-        1,1,1,  // facette 3
-        2,2,2,  // facette 4 (z=-1)
-        2,2,2,  // facette 5
-        3,3,3,  // facette 6 (x=1)
-        3,3,3,  // facette 7
-        4,4,4,  // facette 8 (y=1)
-        4,4,4,  // facette 9
-        5,5,5,  // facette 10 (z=1)
-        5,5,5   // facette 11
-    };*/
 
     //GLfloat normals[12] = {0};
     /*int j = 0;
@@ -287,9 +300,10 @@ void Drawing::paint()
     glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    glDisable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
     glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-    glClearColor(0., 0., 0., 1.);
+    glClearColor(0.2, 0.2, 0.2, 1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     if (!m_program)
@@ -314,27 +328,30 @@ void Drawing::paint()
     m_vao0->bind();
 
     // initialisation des VBO
-    QOpenGLBuffer m_positionBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer m_vertexBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     //QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     // initialisation des IBO
     QOpenGLBuffer m_positionIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
     //QOpenGLBuffer m_colorIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);*/
 
     // VBO pour les vertices
-    m_positionBuffer.create();
-    m_positionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_positionBuffer.bind();
+    m_vertexBuffer.create();
+    m_vertexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_vertexBuffer.bind();
+    //m_positionBuffer.allocate( &vertices, 12 * 3 * sizeof(GLfloat));
+    m_vertexBuffer.allocate( &vertices, 24 * 3 * sizeof(GLfloat) + 24 * 4 * sizeof(GLfloat));
 
     m_positionIndexBuffer.create();
     m_positionIndexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_positionIndexBuffer.bind();
-    m_positionIndexBuffer.allocate( &indexes, 12 * 3 * sizeof( GLfloat ) );
+    //m_positionIndexBuffer.allocate( &indexes, 12 * 3 * sizeof( GLfloat ) );
+    m_positionIndexBuffer.allocate( &indexes, 36 * sizeof( GLushort) );
 
-    m_positionBuffer.allocate( &vertices, 16 * 3 * sizeof(GLfloat));
     m_program->enableAttributeArray("vertex");
     m_program->setAttributeBuffer("vertex", GL_FLOAT, 0, 3);
     m_program->enableAttributeArray("in_color");
-    m_program->setAttributeBuffer("in_color", GL_FLOAT, 8 * 3 * sizeof(GLfloat), 3);
+    // m_program->setAttributeBuffer("in_color", GL_FLOAT, 8 * 3 * sizeof(GLfloat), 3);
+    m_program->setAttributeBuffer("in_color", GL_FLOAT, 24 * 3 * sizeof(GLfloat), 4);
 
     /*m_program->enableAttributeArray("vertex");
     m_program->setAttributeBuffer("vertex", GL_FLOAT ,8 * 3 * sizeof( GLfloat ), 3);
@@ -366,14 +383,12 @@ void Drawing::paint()
     //glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
     //glDrawArrays(GL_TRIANGLES,0,36);
 
-    glDrawElements(GL_TRIANGLES,12*3,GL_UNSIGNED_INT,0);
+    glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_SHORT,NULL);
     //glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
     m_vao0->release();
     m_program->release();
-
     //m_vao0->release();
-
 }
 
 void Drawing::cleanup()

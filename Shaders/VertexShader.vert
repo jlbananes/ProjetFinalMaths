@@ -6,10 +6,10 @@ uniform lowp float t;
 
 //varying highp vec2 coords;
 
-in vec3 in_color;
+in vec4 in_color;
 in vec4 vertex;
 
-smooth out vec3 color;
+smooth out vec4 color;
 
 //float PI = 3.1415926535897932384626433832795;
 //lowp float a = PI/4;

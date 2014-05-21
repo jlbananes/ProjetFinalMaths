@@ -9,7 +9,7 @@
 //varying highp vec2 coords;
 
 //in vec4 varyingColor;
-smooth in vec3 color;
+smooth in vec4 color;
 
 out vec4 out_color;
 
@@ -19,6 +19,7 @@ void main(void)
     i = smoothstep(0.8, 0.8, 0.8);
     i = floor(i * 20.) / 20.;
     gl_FragColor = vec4(coords * .5 + .5, i, i);*/     // test faces multicolores
-    out_color = vec4(color, 1.0);               // test faces colorées unies
+    //out_color = vec4(color, 1.0);               // test faces colorées unies
+    out_color = vec4(color);
     //gl_FragColor = color;                         // test faces jaunes
 }
