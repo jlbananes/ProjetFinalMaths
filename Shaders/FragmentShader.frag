@@ -10,7 +10,9 @@
 
 //in vec4 varyingColor;
 smooth in vec4 color;
+smooth in vec4 texc;
 
+sampler2D texture;
 out vec4 out_color;
 
 void main(void)
@@ -20,6 +22,7 @@ void main(void)
     i = floor(i * 20.) / 20.;
     gl_FragColor = vec4(coords * .5 + .5, i, i);*/     // test faces multicolores
     //out_color = vec4(color, 1.0);               // test faces colorées unies
-    out_color = vec4(color);
+    //out_color = vec4(color);
+    gl_FragColor = texture2D(texture, texc);
     //gl_FragColor = color;                         // test faces jaunes
 }

@@ -8,8 +8,10 @@ uniform lowp float t;
 
 in vec4 in_color;
 in vec4 vertex;
+in vec4 in_texture;
 
 smooth out vec4 color;
+smooth out vec4 texture;
 
 //float PI = 3.1415926535897932384626433832795;
 //lowp float a = PI/4;
@@ -31,4 +33,5 @@ void main(void)
     gl_Position = mvpMatrix * rotationXY * vertex;
     //coords = vertex.xy;
     color = in_color;
+    texture = in_texture;
 }
