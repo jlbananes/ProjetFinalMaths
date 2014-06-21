@@ -1,8 +1,11 @@
 #include "drawing.h"
+#include "Utils.h"
 
 #define highp
 #define mediump
 #define lowp
+
+using namespace Utils;
 
 Drawing::Drawing()
     : m_program(0)
@@ -18,9 +21,6 @@ Drawing::Drawing()
     // Create an OpenGL context
     m_context = new QOpenGLContext;
     m_context->create();
-
-    // Make the context current on this window
-    //m_context->makeCurrent( this );
 }
 
 void Drawing::setT(qreal t)
@@ -132,9 +132,6 @@ void Drawing::handleWindowChanged(QQuickWindow *win)
 
 void Drawing::paint()
 {
-
-    QMatrix4x4 mMatrix;
-    QMatrix4x4 vMatrix;
     QMatrix4x4 cameraTransformation;
     QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 5);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
@@ -143,9 +140,68 @@ void Drawing::paint()
     glGetIntegerv(GL_TIMESTAMP, &time);
     static const GLfloat lightpos[] = {.5, 1., 1., 0.};
 
+    QMatrix4x4 mMatrix;
+    QMatrix4x4 vMatrix;
+
+    //Resize
+    pMatrix.setToIdentity();
+    vMatrix.lookAt(cameraPosition, QVector3D(0, 0, 0), cameraUpDirection);
+
+    if (m_x!=currentXmove || m_y!=currentYmove)
+    {
+        currentRotationMatrix = rotateCamera(cameraPosition, cameraUpDirection, m_x, m_y);
+        currentXmove = m_x;
+        currentYmove = m_y;
+    }
+    else //if (clic relaché)
+    {
+        totalRotationMatrix = totalRotationMatrix * currentRotationMatrix;
+        currentRotationMatrix.setToIdentity();
+    }
+    vMatrix = vMatrix * totalRotationMatrix * currentRotationMatrix;
+
+    qreal ratio = window()->devicePixelRatio();
+    int w = int(ratio * window()->width());
+    int h = int(ratio * window()->height());
+    pMatrix.perspective(60.0, (double) w / (double) h, 0.001, 1000);
+
+    //glOrtho(-5.,5.,-5.,5.,.1,10.);
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION|GL_MODELVIEW);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    GLfloat light_position[4] = {70.0, 70.0, 70.0, 0.1};
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+    glClearColor(0.1, 0.1, 0.1, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+
+
+    if (!m_program)
+    {
+        /* D:\\Workspace */
+        m_program = new QOpenGLShaderProgram();
+        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "..\\..\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "..\\..\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
+        m_program->bindAttributeLocation("gl_Vertex", 0);
+        m_program->link();
+
+        connect(window()->openglContext(), SIGNAL(aboutToBeDestroyed()), this, SLOT(cleanup()), Qt::DirectConnection);
+    }
+    m_program->bind();
+    m_program->setUniformValue("t", (float)m_thread_t);
+    m_program->setUniformValue("mvpMatrix", pMatrix * vMatrix * mMatrix);
+
     // tableau des vertices distincts
     GLfloat vertices[] =
-    {  
+    {
         /*
         -1.0,-1.0,-1.0, // vertex 0
         -1.0,-1.0, 1.0, // vertex 1
@@ -187,36 +243,106 @@ void Drawing::paint()
         1.0, 1.0, 1.0,  // vertex 7
         1.0,-1.0, 1.0,  // vertex 4
 
+    };
 
-        1.0,0.0,0.0,1.0, // couleur 0 (rouge)
-        1.0,0.0,0.0,1.0,
-        1.0,0.0,0.0,1.0,
-        1.0,0.0,0.0,1.0,
+    GLfloat alpha = 0.8;
+    GLfloat colors[] =
+    {
+        1.0,0.0,0.0,alpha, // couleur 0 (rouge)
+        1.0,0.0,0.0,alpha,
+        1.0,0.0,0.0,alpha,
+        1.0,0.0,0.0,alpha,
 
-        0.0,0.0,1.0,1.0, // couleur 1 (bleu)
-        0.0,0.0,1.0,1.0,
-        0.0,0.0,1.0,1.0,
-        0.0,0.0,1.0,1.0,
+        0.0,0.0,1.0,alpha, // couleur 1 (bleu)
+        0.0,0.0,1.0,alpha,
+        0.0,0.0,1.0,alpha,
+        0.0,0.0,1.0,alpha,
 
-        0.0,1.0,0.0,1.0, // couleur 2 (vert)
-        0.0,1.0,0.0,1.0,
-        0.0,1.0,0.0,1.0,
-        0.0,1.0,0.0,1.0,
+        0.0,1.0,0.0,alpha, // couleur 2 (vert)
+        0.0,1.0,0.0,alpha,
+        0.0,1.0,0.0,alpha,
+        0.0,1.0,0.0,alpha,
 
-        1.0,1.0,0.0,1.0, // couleur 3 (jaune)
-        1.0,1.0,0.0,1.0,
-        1.0,1.0,0.0,1.0,
-        1.0,1.0,0.0,1.0,
+        1.0,0.0,0.0,alpha, // couleur 0 (rouge)
+        1.0,0.0,0.0,alpha,
+        1.0,0.0,0.0,alpha,
+        1.0,0.0,0.0,alpha,
 
-        1.0,0.0,1.0,1.0,  // couleur 4 (magenta)
-        1.0,0.0,1.0,1.0,
-        1.0,0.0,1.0,1.0,
-        1.0,0.0,1.0,1.0,
+        0.0,0.0,1.0,alpha, // couleur 1 (bleu)
+        0.0,0.0,1.0,alpha,
+        0.0,0.0,1.0,alpha,
+        0.0,0.0,1.0,alpha,
 
-        0.0,1.0,1.0,1.0,  // couleur 5 (cyan)
-        0.0,1.0,1.0,1.0,
-        0.0,1.0,1.0,1.0,
-        0.0,1.0,1.0,1.0
+        0.0,1.0,0.0,alpha, // couleur 2 (vert)
+        0.0,1.0,0.0,alpha,
+        0.0,1.0,0.0,alpha,
+        0.0,1.0,0.0,alpha,
+    };
+
+    GLfloat normals[] =
+    {
+        -1.0,0.0,0.0,   // face (x=-1)
+        -1.0,0.0,0.0,
+        -1.0,0.0,0.0,
+        -1.0,0.0,0.0,
+
+        0.0,-1.0,0.0,   // face (y=-1)
+        0.0,-1.0,0.0,
+        0.0,-1.0,0.0,
+        0.0,-1.0,0.0,
+
+        0.0,0.0,-1.0,   // face (z=-1)
+        0.0,0.0,-1.0,
+        0.0,0.0,-1.0,
+        0.0,0.0,-1.0,
+
+        1.0,0.0,0.0,   // face (x=1)
+        1.0,0.0,0.0,
+        1.0,0.0,0.0,
+        1.0,0.0,0.0,
+
+        0.0,1.0,0.0,   // face (y=1)
+        0.0,1.0,0.0,
+        0.0,1.0,0.0,
+        0.0,1.0,0.0,
+
+        0.0,0.0,1.0,   // face (z=1)
+        0.0,0.0,1.0,
+        0.0,0.0,1.0,
+        0.0,0.0,1.0,
+    };
+
+    GLfloat texCoords[] =
+    {
+        0.0,0.33,   // face (x=-1)
+        0.25,0.33,
+        0.25,0.67,
+        0.0,0.67,
+
+        0.5,0.33,   // face (y=-1)
+        0.25,0.0,
+        0.5,0.0,
+        0.25,0.33,
+
+        0.75,0.67,  // face (z=-1)
+        1.0,0.33,
+        1.0,0.67,
+        0.75,0.33,
+
+        0.5,0.67,   // face (x=1)
+        0.75,0.33,
+        0.75,0.67,
+        0.5,0.33,
+
+        0.5,0.67,   // face (y=1)
+        0.5,1.0,
+        0.25,1.0,
+        0.25,0.67,
+
+        0.25,0.67,  // face (z=1)
+        0.25,0.33,
+        0.5,0.67,
+        0.5,0.33,
     };
 
     GLushort indexes[] =
@@ -233,162 +359,90 @@ void Drawing::paint()
         16,18,19,
         20,21,22,   // face (z=1)
         22,21,23
-
-        /*0,1,2,  // facette 0 (x=-1)
-        0,2,3,  // facette 1
-        4,0,5,  // facette 2 (y=-1)
-        4,1,0,  // facette 3
-        6,0,3,  // facette 4 (z=-1)
-        6,5,0,  // facette 5
-        7,5,6,  // facette 6 (x=1)
-        5,7,4,  // facette 7
-        7,6,3,  // facette 8 (y=1)
-        7,3,2,  // facette 9
-        2,1,7,  // facette 10 (z=1)
-        7,1,4   // facette 11*/
     };
 
-    /*GLfloat colors[] =
-    {
-
-
-    };*/
-
-
-    //GLfloat normals[12] = {0};
-    /*int j = 0;
-    for(int i = 0; i < 12*3; i+=9)
-    {
-        QVector3D p1 = QVector3D(values[i], values[i+1], values[i+2]);
-        QVector3D p2 = QVector3D(values[i+3], values[i+4], values[i+5]);
-        QVector3D p3 = QVector3D(values[i+6], values[i+7], values[i+8]);
-
-        QVector3D n = getNormal(p1, p2, p3);
-        normals[j++] = (GLfloat)n.x();
-        normals[j++] = (GLfloat)n.y();
-        normals[j++] = (GLfloat)n.z();
-    }*/
-
-    //Resize
-    pMatrix.setToIdentity();
-    vMatrix.lookAt(cameraPosition, QVector3D(0, 0, 0), cameraUpDirection);
-
-    //QMatrix4x4 newRotationMatrix;
-    if (m_x!=currentXmove || m_y!=currentYmove)
-    {
-        //printf("clic !!\n");
-        currentRotationMatrix = rotateCamera(cameraPosition, cameraUpDirection, m_x, m_y);
-        currentXmove = m_x;
-        currentYmove = m_y;
-    }
-    else //if (clic relaché)
-    {
-        totalRotationMatrix = totalRotationMatrix * currentRotationMatrix;
-        currentRotationMatrix.setToIdentity();
-    }
-    vMatrix = vMatrix * totalRotationMatrix * currentRotationMatrix;
-
-    qreal ratio = window()->devicePixelRatio();
-    int w = int(ratio * window()->width());
-    int h = int(ratio * window()->height());
-    pMatrix.perspective(60.0, (double) w / (double) h, 0.001, 1000);
-
-    //glOrtho(-5.,5.,-5.,5.,.1,10.);
-    glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION|GL_MODELVIEW);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-    glClearColor(0.2, 0.2, 0.2, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-    if (!m_program)
-    {
-        /* D:\\Workspace */
-        m_program = new QOpenGLShaderProgram();
-        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "..\\..\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
-        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "..\\..\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
-        m_program->bindAttributeLocation("gl_Vertex", 0);
-        m_program->link();
-
-        connect(window()->openglContext(), SIGNAL(aboutToBeDestroyed()), this, SLOT(cleanup()), Qt::DirectConnection);
-    }
     m_program->bind();
-    //m_program->enableAttributeArray(0);
-    m_program->setUniformValue("t", (float)m_thread_t);
-    m_program->setUniformValue("mvpMatrix", pMatrix * vMatrix * mMatrix);
-
     // création du VAO
-    QOpenGLVertexArrayObject* m_vao0 = new QOpenGLVertexArrayObject(this);
+    m_vao0 = new QOpenGLVertexArrayObject(this);
     m_vao0->create();
     m_vao0->bind();
 
     // initialisation des VBO
     QOpenGLBuffer m_vertexBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    //QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    // initialisation des IBO
-    QOpenGLBuffer m_positionIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
-    //QOpenGLBuffer m_colorIndexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);*/
+    QOpenGLBuffer m_colorBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer m_texCoordBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer m_normalBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+
+    // initialisation de l'Index Buffer Object
+    QOpenGLBuffer m_indexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
+
+    // Index Buffer Object
+    m_indexBuffer.create();
+    m_indexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_indexBuffer.bind();
+    m_indexBuffer.allocate( &indexes, 36 * sizeof( GLushort) );
 
     // VBO pour les vertices
     m_vertexBuffer.create();
     m_vertexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_vertexBuffer.bind();
-    //m_positionBuffer.allocate( &vertices, 12 * 3 * sizeof(GLfloat));
-    m_vertexBuffer.allocate( &vertices, 24 * 3 * sizeof(GLfloat) + 24 * 4 * sizeof(GLfloat));
-
-    m_positionIndexBuffer.create();
-    m_positionIndexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_positionIndexBuffer.bind();
-    //m_positionIndexBuffer.allocate( &indexes, 12 * 3 * sizeof( GLfloat ) );
-    m_positionIndexBuffer.allocate( &indexes, 36 * sizeof( GLushort) );
-
+    m_vertexBuffer.allocate( &vertices, 24 * 3 * sizeof(GLfloat) );
     m_program->enableAttributeArray("vertex");
     m_program->setAttributeBuffer("vertex", GL_FLOAT, 0, 3);
-    m_program->enableAttributeArray("in_color");
-    // m_program->setAttributeBuffer("in_color", GL_FLOAT, 8 * 3 * sizeof(GLfloat), 3);
-    m_program->setAttributeBuffer("in_color", GL_FLOAT, 24 * 3 * sizeof(GLfloat), 4);
-
-    /*m_program->enableAttributeArray("vertex");
-    m_program->setAttributeBuffer("vertex", GL_FLOAT ,8 * 3 * sizeof( GLfloat ), 3);
-    m_program->disableAttributeArray("vertex");*/
-    //m_positionIndexBuffer.release();
+    m_vertexBuffer.release();
 
     // VBO pour les couleurs
-    /*m_colorBuffer.create();
+    m_colorBuffer.create();
     m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_colorBuffer.bind();
-    m_colorBuffer.allocate( &colors, 12 * 3 * 3 * sizeof( GLfloat ) );
+    m_colorBuffer.allocate( &colors, 24 * 4 * sizeof(GLfloat));
     m_program->enableAttributeArray("in_color");
-    m_program->setAttributeBuffer("in_color", GL_FLOAT ,0, 3);*/
-   // m_colorBuffer.release();
+    m_program->setAttributeBuffer("in_color", GL_FLOAT, 0, 4);
+    m_colorBuffer.release();
 
-    /*m_colorIndexBuffer.create();
-    //m_colorIndexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_colorIndexBuffer.bind();
-    m_colorIndexBuffer.allocate( &colorsIndex, 12 * 3 * sizeof( GLfloat ) );
-    m_program->enableAttributeArray("in_color");
-    m_program->setAttributeBuffer("in_color", GL_FLOAT ,6 * 3 * sizeof( GLfloat ), 3);
-    m_program->disableAttributeArray("in_color");*/
+    // VBO pour les normales
+    m_normalBuffer.create();
+    m_normalBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_normalBuffer.bind();
+    m_normalBuffer.allocate( &normals, 24 * 3 * sizeof(GLfloat));
+    m_program->enableAttributeArray("in_normal");
+    m_program->setAttributeBuffer("in_normal", GL_FLOAT, 0, 3);
+    m_normalBuffer.release();
 
-    //m_program->setUniformValue("color", QVector4D(1.0, 1.0, 0.0, 1.0));
-    //m_program->setAttributeArray("normals", normals, 3);
-    //m_program->enableAttributeArray("normals");
 
-    m_vao0->bind();
-    //glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
-    //glDrawArrays(GL_TRIANGLES,0,36);
 
-    glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_SHORT,NULL);
-    //glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+    /*
+    //QPixmap texture = QPixmap(QString("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg"));
+    //GLuint texture = m_context->functions()->glActiveTexture(GL_TEXTURE0);
+    GLuint texID = m_context->bindTexture(QPixmap(QString("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg")));
+    //textures[0] = texID;
+    glBindTexture(GL_TEXTURE_2D,texID);*/
+
+    // Prepare texture
+    QOpenGLTexture *texture = new QOpenGLTexture(QImage("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg").mirrored());
+    //texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    //texture->setMagnificationFilter(QOpenGLTexture::Linear);
+    // Render with texture
+    texture->bind(0);
+    glBindTexture(GL_TEXTURE_2D,0);
+
+    // VBO pour les coordonnées de texture
+    m_texCoordBuffer.create();
+    m_texCoordBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_texCoordBuffer.bind();
+    m_texCoordBuffer.allocate( &texCoords, 24 * 4 * sizeof(GLfloat));
+    m_program->enableAttributeArray("in_texCoord");
+    m_program->setAttributeBuffer("in_texCoord", GL_FLOAT, 0, 4);
+    m_texCoordBuffer.release();
 
     m_vao0->release();
+
+
+    m_vao0->bind();
+    glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_SHORT,0);
+    //glDrawElements(GL_LINE_LOOP,36,GL_UNSIGNED_SHORT,0);
+    m_vao0->release();
     m_program->release();
-    //m_vao0->release();
 }
 
 void Drawing::cleanup()
