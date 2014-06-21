@@ -1,5 +1,4 @@
 #include "drawing.h"
-#include "Utils.h"
 
 #define highp
 #define mediump

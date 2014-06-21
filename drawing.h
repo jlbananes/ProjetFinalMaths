@@ -22,6 +22,9 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLFunctions_4_3_Core>
 #include <QOpenGLFunctions>
+#include <QGLContext>
+
+#include "Utils.h"
 
 class Drawing : public QQuickItem
 {
@@ -47,9 +50,8 @@ public:
 
     QOpenGLContext* m_context;
     QOpenGLFunctions_4_3_Core* m_funcs;
-    QOpenGLFunctions* m_glFuncs;
+    //QOpenGLFunctions* m_funcs;
     //QAbstractOpenGLFunctions* m_funcs;
-
 
 signals:
     void tChanged();
@@ -67,6 +69,7 @@ private slots:
     void handleWindowChanged(QQuickWindow *win);
 
 private:
+    QOpenGLVertexArrayObject* m_vao0;
     QOpenGLShaderProgram *m_program;
     QMatrix4x4 pMatrix;
     QMatrix4x4 rotateCamera(QVector3D,QVector3D, int, int);
