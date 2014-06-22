@@ -2,12 +2,14 @@
 #include <QtQuick/QQuickView>
 
 #include "drawing.h"
+#include "Retopology.h"
 
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
     qmlRegisterType<Drawing>("OpenGLUnderQML", 1, 0, "Drawing");
+    Retopology::TestFunction();
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);

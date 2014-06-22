@@ -73,6 +73,7 @@ private:
     QOpenGLShaderProgram *m_program;
     QMatrix4x4 pMatrix;
     QMatrix4x4 rotateCamera(QVector3D,QVector3D, int, int);
+    void LoadMeshData(Mesh*);
 
     QMatrix4x4 totalRotationMatrix;
     QMatrix4x4 currentRotationMatrix;
@@ -81,7 +82,6 @@ private:
     qreal currentXmove;
     qreal currentYmove;
 
-    //QVector3D getNormal(QVector3D &p1, QVector3D &p2, QVector3D &p3);
     qreal m_t;
     qreal m_thread_t;
     qreal m_x, m_thread_x;

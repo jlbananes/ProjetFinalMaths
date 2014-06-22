@@ -1,11 +1,27 @@
 QT += qml quick opengl
 
+QMAKE_CXXFLAGS += -std=gnu++11
+
 HEADERS += \
     importmesh.h \
-    drawing.h
+    drawing.h \
+    Point.h \
+    Mesh.h \
+    Face.h \
+    Edge.h \
+    Surface.h \
+    Utils.h \
+    Retopology.h
 SOURCES += main.cpp \
     importmesh.cpp \
-    drawing.cpp
+    drawing.cpp \
+    Point.cpp \
+    Mesh.cpp \
+    Face.cpp \
+    Edge.cpp \
+    Utils.cpp \
+    Surface.cpp \
+    Retopology.cpp
 RESOURCES += openglunderqml.qrc
 
 target.path = /qml/ProjetFinalMaths

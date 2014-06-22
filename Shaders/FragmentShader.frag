@@ -1,6 +1,3 @@
-//http://www.youtube.com/user/thecplusplusguy
-//http://www.youtube.com/watch?v=MRD_zN0SWh0
-
 #version 330
 
 //uniform vec4 normals;
@@ -8,12 +5,14 @@
 //uniform lowp float t;
 //varying highp vec2 coords;
 
-//in vec4 varyingColor;
 smooth in vec4 color;
-smooth in vec4 texc;
+smooth in vec4 texCoord;
+smooth in vec3 normal;
 
-sampler2D texture;
+uniform sampler2D texture;
+
 out vec4 out_color;
+lowp float lightIntensity;
 
 void main(void)
 {
@@ -22,7 +21,11 @@ void main(void)
     i = floor(i * 20.) / 20.;
     gl_FragColor = vec4(coords * .5 + .5, i, i);*/     // test faces multicolores
     //out_color = vec4(color, 1.0);               // test faces colorées unies
-    //out_color = vec4(color);
-    gl_FragColor = texture2D(texture, texc);
+
+    vec3 lightDirection = vec3(0.8,0.2,0.5);
+    lightIntensity = 4.0 * pow(dot(normalize(normal),normalize(lightDirection)),2);
+
+    out_color = vec4(color.rgb * lightIntensity, color.a);
+    //out_color = texture2D(texture, vec2(texCoord.st));
     //gl_FragColor = color;                         // test faces jaunes
 }

@@ -2,16 +2,17 @@
 
 uniform mat4 mvpMatrix;
 uniform lowp float t;
-//uniform vec4 color;
 
 //varying highp vec2 coords;
 
-in vec4 in_color;
 in vec4 vertex;
-in vec4 in_texture;
+in vec4 in_color;
+in vec3 in_normal;
+in vec2 in_texCoord;
 
 smooth out vec4 color;
-smooth out vec4 texture;
+smooth out vec3 normal;
+smooth out vec4 texCoord;
 
 //float PI = 3.1415926535897932384626433832795;
 //lowp float a = PI/4;
@@ -31,7 +32,9 @@ void main(void)
 {
     mat4 rotationXY = rotationX * rotationY;
     gl_Position = mvpMatrix * rotationXY * vertex;
-    //coords = vertex.xy;
+    //texCoord = vec4(in_texCoord,vec2(0.0,0.0));
+    vec4 newNormal = mvpMatrix * rotationXY * vec4(in_normal,1.0);
+    normal = vec3(newNormal.xyz);
+    //gl_Normal = in_normal;
     color = in_color;
-    texture = in_texture;
 }

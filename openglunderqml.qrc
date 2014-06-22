@@ -6,4 +6,7 @@
         <file>Shaders/FragmentShader.frag</file>
         <file>Shaders/VertexShader.vert</file>
     </qresource>
+    <qresource prefix="/Textures">
+        <file>Textures/texture_caisse.jpg</file>
+    </qresource>
 </RCC>
