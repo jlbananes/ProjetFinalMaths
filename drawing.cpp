@@ -20,6 +20,14 @@ Drawing::Drawing()
     // Create an OpenGL context
     m_context = new QOpenGLContext;
     m_context->create();
+
+    importMesh iMesh;
+    if(iMesh.import("D:\\Workspace\\ProjetFinalMaths\\Assets\\sphere.obj",
+                 _vertices, _uvs, _normals,
+                 _vertexIndices, _uvIndices, _normalIndices))
+    {
+        cout << "lecture ok" << endl;
+    }
 }
 
 void Drawing::setT(qreal t)
@@ -129,10 +137,55 @@ void Drawing::handleWindowChanged(QQuickWindow *win)
     }
 }
 
+// chargement des données du mesh dans les tableaux utilisés par la fonction paint()
+/*void Drawing::LoadMeshData(Mesh* mesh, GLfloat[] &_vertices, GLfloat[] &_normals, GLfloat[] &_texCoords, GLuint[] &_indexes)
+{
+    for (unsigned int i=0; i<mesh->getSurfaces().size(); i++)
+    {
+        for (unsigned int j=0; j<mesh->getSurfaces()[i]->getFaces().size(); j++)
+        {
+            return;
+        }
+    }
+}*/
+
 void Drawing::paint()
 {
+    unsigned int i = 0;
+    unsigned int el = 0;
+    unsigned int id = 0;
+    unsigned int concombre = _vertices.size()*4;
+    GLfloat vect3[_vertices.size()*3];
+    for(vector<QVector3D>::iterator it = _vertices.begin(); it != _vertices.end(); ++it)
+    {
+        QVector3D v = *it;
+        vect3[i++] = v.x();
+        vect3[i++] = v.y();
+        vect3[i++] = v.z();
+        el+=3;
+    }
+    i = 0;
+    GLuint idex3[_vertexIndices.size()];
+    for(vector<unsigned int>::iterator it = _vertexIndices.begin(); it != _vertexIndices.end(); ++it)
+    {
+        idex3[i++] = (*it)-1;
+        id++;
+    }
+    /*
+    cout << el << endl;
+    cout << id << endl;
+    for(unsigned int i = 0; i < el; i+=3)
+    {
+        cout << vect3[i] << " " << vect3[i+1] << " " << vect3[i+2] << endl;
+    }
+    cout << endl;
+    for(unsigned int i = 0; i < id; i+=3)
+    {
+        cout << idex3[i] << " " << idex3[i+1] << " " << idex3[i+2] << endl;
+    }
+    //*/
     QMatrix4x4 cameraTransformation;
-    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 5);
+    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 10);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
     GLint time;
 
@@ -172,23 +225,21 @@ void Drawing::paint()
     GLfloat light_position[4] = {70.0, 70.0, 70.0, 0.1};
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_TEXTURE_2D);
+    //glEnable(GL_LIGHT0);
+    //glEnable(GL_LIGHTING);
+    //glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-    glClearColor(0.1, 0.1, 0.1, 1.0);
+    //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);y
+    glClearColor(0, 1, 1, 1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-
 
     if (!m_program)
     {
-        /* D:\\Workspace */
+        /* D:\\Workspace //*/
         m_program = new QOpenGLShaderProgram();
-        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "..\\..\\ProjetFinalMaths\\Shaders\\VertexShader.vert");
-        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "..\\..\\ProjetFinalMaths\\Shaders\\FragmentShader.frag");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/VertexShader");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/FragmentShader");
         m_program->bindAttributeLocation("gl_Vertex", 0);
         m_program->link();
 
@@ -198,20 +249,77 @@ void Drawing::paint()
     m_program->setUniformValue("t", (float)m_thread_t);
     m_program->setUniformValue("mvpMatrix", pMatrix * vMatrix * mMatrix);
 
-    // tableau des vertices distincts
+
+    // tableaux de données du mesh
+    GLuint nbOfIndexes = 24;
+    //GLfloat* vertices = new GLfloat[nbOfIndexes*3];
+    //GLfloat* colors = new GLfloat[nbOfIndexes*4];
+    //GLfloat* normals = new GLfloat[nbOfIndexes*3];
+    //GLfloat* texCoords = new GLfloat[nbOfIndexes*2];
+    //GLushort* indexes = new GLushort[nbOfIndexes];
+
+    /*/ tableau des vertices distincts (position, couleur et normale unique)
+    for (unsigned int i=0; i<nbOfIndexes*3; i=i+3)
+    {
+         vertices[i] = -1.0;
+         vertices[i+1] = 1.0;
+         vertices[i+2] = -1.0;
+    }
+    //*/
+    /*/ tableau des couleurs
+    GLfloat alpha = 0.8;
+    for (unsigned int i=0; i<nbOfIndexes*4; i=i+4)
+    {
+         colors[i] = 1.0;
+         colors[i+1] = 1.0;
+         colors[i+2] = 1.0;
+         colors[i+3] = alpha;
+    }
+
+    // tableau des normales
+    for (unsigned int i=0; i<nbOfIndexes*3; i=i+3)
+    {
+         normals[i] = 1.0;
+         normals[i+1] = 1.0;
+         normals[i+2] = 1.0;
+    }
+
+    // tableau des coordonnées de texture
+    for (unsigned int i=0; i<nbOfIndexes*2; i=i+2)
+    {
+         texCoords[i] = 0.5;
+         texCoords[i+1] = 0.5;
+    }
+
+    // tableau des indices
+    for (unsigned int i=0; i<nbOfIndexes; i++)
+    {
+         indexes[i] = i;
+    }
+    //*/
+    // tableaux de données statiques
+    //*
     GLfloat vertices[] =
     {
-        /*
-        -1.0,-1.0,-1.0, // vertex 0
-        -1.0,-1.0, 1.0, // vertex 1
-        -1.0, 1.0, 1.0, // vertex 2
-        -1.0, 1.0,-1.0, // vertex 3
-        1.0,-1.0, 1.0,  // vertex 4
-        1.0,-1.0,-1.0,  // vertex 5
-        1.0, 1.0,-1.0,  // vertex 6
-        1.0, 1.0, 1.0,  // vertex 7
-        */
+        1.000000, -1.000000, -1.000000,
+        1.000000, -1.000000, 1.000000,
+        -1.000000, -1.000000, 1.000000,
+        -1.000000, -1.000000, -1.000000,
+        1.000000, 1.000000, -0.999999,
+        0.999999, 1.000000, 1.000001,
+        -1.000000, 1.000000, 1.000000,
+        -1.000000, 1.000000, -1.000000
 
+        //-1.0,-1.0,-1.0, // vertex 0
+        //-1.0,-1.0, 1.0, // vertex 1
+        //-1.0, 1.0, 1.0, // vertex 2
+        //-1.0, 1.0,-1.0, // vertex 3
+        //1.0,-1.0, 1.0,  // vertex 4
+        //1.0,-1.0,-1.0,  // vertex 5
+        //1.0, 1.0,-1.0,  // vertex 6
+        //1.0, 1.0, 1.0,  // vertex 7
+
+        /*
         -1.0,-1.0,-1.0, // vertex 0     // face (x=-1)
         -1.0,-1.0, 1.0, // vertex 1
         -1.0, 1.0, 1.0, // vertex 2
@@ -241,9 +349,19 @@ void Drawing::paint()
         -1.0,-1.0, 1.0, // vertex 1
         1.0, 1.0, 1.0,  // vertex 7
         1.0,-1.0, 1.0,  // vertex 4
-
+        //*/
     };
-
+    //*/
+    GLfloat alpha = 1.0;
+    GLfloat colors[_vertices.size()*4];
+    for(unsigned int i = 0; i < _vertices.size()*4; i+=4)
+    {
+        colors[i] = 1.0;
+        colors[i+1] = 0.0;
+        colors[i+2] = 0.0;
+        colors[i+3] = alpha;
+    }
+    /*
     GLfloat alpha = 0.8;
     GLfloat colors[] =
     {
@@ -277,9 +395,11 @@ void Drawing::paint()
         0.0,1.0,0.0,alpha,
         0.0,1.0,0.0,alpha,
     };
-
+    //*/
+    //*
     GLfloat normals[] =
     {
+        //*
         -1.0,0.0,0.0,   // face (x=-1)
         -1.0,0.0,0.0,
         -1.0,0.0,0.0,
@@ -309,8 +429,10 @@ void Drawing::paint()
         0.0,0.0,1.0,
         0.0,0.0,1.0,
         0.0,0.0,1.0,
+        //*/
     };
-
+    //*/
+    //*
     GLfloat texCoords[] =
     {
         0.0,0.33,   // face (x=-1)
@@ -343,9 +465,23 @@ void Drawing::paint()
         0.5,0.67,
         0.5,0.33,
     };
-
-    GLushort indexes[] =
+    //*/
+    //*
+    GLuint indexes[] =
     {
+        0, 1, 2,
+        4, 7, 6,
+        0, 4, 5,
+        1, 5, 6,
+        2, 6, 7,
+        4, 0, 3,
+        3, 0, 2,
+        5, 4, 6,
+        1, 0, 5,
+        2, 1, 6,
+        3, 2, 7,
+        7, 4, 3
+        /*
         0,1,2,      // face (x=-1)
         0,2,3,
         4,5,6,      // face (y=-1)
@@ -358,7 +494,9 @@ void Drawing::paint()
         16,18,19,
         20,21,22,   // face (z=1)
         22,21,23
+        //*/
     };
+    //*/
 
     m_program->bind();
     // création du VAO
@@ -379,13 +517,13 @@ void Drawing::paint()
     m_indexBuffer.create();
     m_indexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_indexBuffer.bind();
-    m_indexBuffer.allocate( &indexes, 36 * sizeof( GLushort) );
+    m_indexBuffer.allocate( &idex3, id * sizeof( GLuint) );
 
     // VBO pour les vertices
     m_vertexBuffer.create();
     m_vertexBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_vertexBuffer.bind();
-    m_vertexBuffer.allocate( &vertices, 24 * 3 * sizeof(GLfloat) );
+    m_vertexBuffer.allocate( &vect3, el * sizeof(GLfloat) );
     m_program->enableAttributeArray("vertex");
     m_program->setAttributeBuffer("vertex", GL_FLOAT, 0, 3);
     m_vertexBuffer.release();
@@ -394,12 +532,13 @@ void Drawing::paint()
     m_colorBuffer.create();
     m_colorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_colorBuffer.bind();
-    m_colorBuffer.allocate( &colors, 24 * 4 * sizeof(GLfloat));
+    m_colorBuffer.allocate( &colors, concombre * sizeof(GLfloat));
     m_program->enableAttributeArray("in_color");
     m_program->setAttributeBuffer("in_color", GL_FLOAT, 0, 4);
     m_colorBuffer.release();
+    //*/
 
-    // VBO pour les normales
+    /*/ VBO pour les normales
     m_normalBuffer.create();
     m_normalBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_normalBuffer.bind();
@@ -407,25 +546,24 @@ void Drawing::paint()
     m_program->enableAttributeArray("in_normal");
     m_program->setAttributeBuffer("in_normal", GL_FLOAT, 0, 3);
     m_normalBuffer.release();
-
-
-
-    /*
+    //*/
+    /*/
     //QPixmap texture = QPixmap(QString("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg"));
     //GLuint texture = m_context->functions()->glActiveTexture(GL_TEXTURE0);
     GLuint texID = m_context->bindTexture(QPixmap(QString("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg")));
     //textures[0] = texID;
     glBindTexture(GL_TEXTURE_2D,texID);*/
+    //*/
 
-    // Prepare texture
+    /*/ Prepare texture
     QOpenGLTexture *texture = new QOpenGLTexture(QImage("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg").mirrored());
     //texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     //texture->setMagnificationFilter(QOpenGLTexture::Linear);
     // Render with texture
     texture->bind(0);
     glBindTexture(GL_TEXTURE_2D,0);
-
-    // VBO pour les coordonnées de texture
+    //*/
+    /*/ VBO pour les coordonnées de texture
     m_texCoordBuffer.create();
     m_texCoordBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_texCoordBuffer.bind();
@@ -433,12 +571,12 @@ void Drawing::paint()
     m_program->enableAttributeArray("in_texCoord");
     m_program->setAttributeBuffer("in_texCoord", GL_FLOAT, 0, 4);
     m_texCoordBuffer.release();
-
+    //*/
     m_vao0->release();
 
 
     m_vao0->bind();
-    glDrawElements(GL_TRIANGLES,36,GL_UNSIGNED_SHORT,0);
+    glDrawElements(GL_TRIANGLES,id,GL_UNSIGNED_INT,0);
     //glDrawElements(GL_LINE_LOOP,36,GL_UNSIGNED_SHORT,0);
     m_vao0->release();
     m_program->release();

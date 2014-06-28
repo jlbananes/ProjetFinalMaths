@@ -33,8 +33,8 @@ void main(void)
     mat4 rotationXY = rotationX * rotationY;
     gl_Position = mvpMatrix * rotationXY * vertex;
     //texCoord = vec4(in_texCoord,vec2(0.0,0.0));
-    vec4 newNormal = mvpMatrix * rotationXY * vec4(in_normal,1.0);
-    normal = vec3(newNormal.xyz);
+    //vec4 newNormal = mvpMatrix * rotationXY * vec4(in_normal,1.0);
+    //normal = vec3(newNormal.xyz);
     //gl_Normal = in_normal;
     color = in_color;
 }

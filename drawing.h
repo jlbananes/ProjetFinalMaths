@@ -25,6 +25,7 @@
 #include <QGLContext>
 
 #include "Utils.h"
+#include "importmesh.h"
 
 class Drawing : public QQuickItem
 {
@@ -88,6 +89,15 @@ private:
     qreal m_y, m_thread_y;
     qreal m_clickedButton, m_thread_clickedButton;
 
+    vector<QVector3D> _vertices;
+    vector<QVector2D> _uvs;
+    vector<QVector3D> _normals;
+    vector<unsigned int> _vertexIndices;
+    vector<unsigned int> _uvIndices;
+    vector<unsigned int> _normalIndices;
+    vector<GLfloat> _verFloat;
+    vector<GLfloat> _uvsFloat;
+    vector<GLfloat> _norFloat;
 };
 
 #endif // DRAWING_H

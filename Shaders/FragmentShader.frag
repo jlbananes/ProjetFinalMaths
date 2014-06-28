@@ -23,7 +23,7 @@ void main(void)
     //out_color = vec4(color, 1.0);               // test faces colorées unies
 
     vec3 lightDirection = vec3(0.8,0.2,0.5);
-    lightIntensity = 4.0 * pow(dot(normalize(normal),normalize(lightDirection)),2);
+    lightIntensity = 4.0;// * pow(dot(normalize(normal),normalize(lightDirection)),2);
 
     out_color = vec4(color.rgb * lightIntensity, color.a);
     //out_color = texture2D(texture, vec2(texCoord.st));

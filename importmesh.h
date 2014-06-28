@@ -2,7 +2,12 @@
 #define IMPORTMESH_H
 
 #include <vector>
-#include <stdio.h>
+#include <iostream> //std::cout
+#include <string>   //std::string
+#include <sstream>  //std::stringstream
+#include <fstream>  //std::fstream
+#include <istream>  //std::istream
+
 #include <QtOpenGL>
 
 using namespace std;
@@ -11,10 +16,14 @@ class importMesh
 {
 public:
     importMesh();
-    bool import( const char * path,
+    void test();
+    bool import(const char * path,
                  vector<QVector3D> & out_vertices,
                  vector<QVector2D> & out_uvs,
-                 vector<QVector3D> & out_normals);
+                 vector<QVector3D> & out_normals,
+                 vector<unsigned int> & _vertexIndices,
+                 vector<unsigned int> & _uvIndices,
+                 vector<unsigned int> & _normalIndices );
 };
 
 #endif // IMPORTMESH_H
