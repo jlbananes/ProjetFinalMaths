@@ -24,4 +24,5 @@ namespace Retopology
                 << ";" << CCC.getY() << ";" << CCC.getZ() << ")" << endl;
     }
 
+
 }

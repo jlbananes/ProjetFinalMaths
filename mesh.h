@@ -2,13 +2,16 @@
 #define MESH_H
 
 #include "Surface.h"
-#include <vector>
+
+using namespace std;
 
 class Mesh
 {
     private:
         vector<Surface*> surfaces;
     public:
+        Mesh(void);
+        Mesh(const Mesh &mesh);
         Mesh(vector<Surface*>);
         void operator=(const Mesh) ;
         //bool operator==(const Surface) const;

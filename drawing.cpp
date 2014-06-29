@@ -22,7 +22,7 @@ Drawing::Drawing()
     m_context->create();
 
     importMesh iMesh;
-    if(iMesh.import("D:\\Workspace\\ProjetFinalMaths\\Assets\\sphere.obj",
+    if(iMesh.import("C:\\Users\\Dylan\\Documents\\GitHub\\ProjetFinalMaths\\Assets\\Dolphin\\dolphin.obj",
                  _vertices, _uvs, _normals,
                  _vertexIndices, _uvIndices, _normalIndices))
     {
@@ -185,7 +185,7 @@ void Drawing::paint()
     }
     //*/
     QMatrix4x4 cameraTransformation;
-    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 10);
+    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 2);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
     GLint time;
 
@@ -236,7 +236,7 @@ void Drawing::paint()
 
     if (!m_program)
     {
-        /* D:\\Workspace //*/
+        /* D:\\\\Workspace //*/
         m_program = new QOpenGLShaderProgram();
         m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/VertexShader");
         m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/FragmentShader");
@@ -548,15 +548,15 @@ void Drawing::paint()
     m_normalBuffer.release();
     //*/
     /*/
-    //QPixmap texture = QPixmap(QString("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg"));
+    //QPixmap texture = QPixmap(QString("..\\\\..\\\\ProjetFinalMaths\\\\Textures\\\\texture_caisse_recadree.jpg"));
     //GLuint texture = m_context->functions()->glActiveTexture(GL_TEXTURE0);
-    GLuint texID = m_context->bindTexture(QPixmap(QString("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg")));
+    GLuint texID = m_context->bindTexture(QPixmap(QString("..\\\\..\\\\ProjetFinalMaths\\\\Textures\\\\texture_caisse_recadree.jpg")));
     //textures[0] = texID;
     glBindTexture(GL_TEXTURE_2D,texID);*/
     //*/
 
     /*/ Prepare texture
-    QOpenGLTexture *texture = new QOpenGLTexture(QImage("..\\..\\ProjetFinalMaths\\Textures\\texture_caisse_recadree.jpg").mirrored());
+    QOpenGLTexture *texture = new QOpenGLTexture(QImage("..\\\\..\\\\ProjetFinalMaths\\\\Textures\\\\texture_caisse_recadree.jpg").mirrored());
     //texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     //texture->setMagnificationFilter(QOpenGLTexture::Linear);
     // Render with texture
@@ -574,12 +574,28 @@ void Drawing::paint()
     //*/
     m_vao0->release();
 
-
-    m_vao0->bind();
+    // affichage des faces
+    /*m_vao0->bind();
     glDrawElements(GL_TRIANGLES,id,GL_UNSIGNED_INT,0);
-    //glDrawElements(GL_LINE_LOOP,36,GL_UNSIGNED_SHORT,0);
+    m_vao0->release();
+    m_program->release();*/
+
+
+    // affichage des edges
+    /*m_vao0->bind();
+    for (unsigned int i=0 ; i<id/3 ; i++)
+    {
+        glDrawElements(GL_LINE_LOOP,3,GL_UNSIGNED_INT, reinterpret_cast<void*>((3*i)*sizeof(unsigned int)));
+    }
+    m_vao0->release();
+    m_program->release();*/
+
+    // affichage des points
+    m_vao0->bind();
+    glDrawElements(GL_POINTS,id,GL_UNSIGNED_INT,0);
     m_vao0->release();
     m_program->release();
+
 }
 
 void Drawing::cleanup()

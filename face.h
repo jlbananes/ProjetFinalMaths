@@ -1,14 +1,17 @@
 #ifndef FACE_H
 #define FACE_H
 
-#include <vector>
 #include "Edge.h"
+
+using namespace std;
 
 class Face
 {
     private:
         vector<Edge*> edges;
     public:
+        Face();
+        Face(const Face &face);
         Face(Edge*, Edge*, Edge*);
         void operator=(const Face) ;
         bool operator==(const Face) const;

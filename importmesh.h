@@ -9,6 +9,7 @@
 #include <istream>  //std::istream
 
 #include <QtOpenGL>
+#include "Data.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ public:
     importMesh();
     void test();
     bool import(const char * path,
+                 //Mesh &out_mesh,
                  vector<QVector3D> & out_vertices,
                  vector<QVector2D> & out_uvs,
                  vector<QVector3D> & out_normals,

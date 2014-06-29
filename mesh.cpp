@@ -1,21 +1,32 @@
 #include "Mesh.h"
+#include <cstddef>
+
+using namespace std;
+
+Mesh::Mesh(void)
+{
+    surfaces = {NULL};
+}
+
+Mesh::Mesh(const Mesh &mesh)
+{
+    for(unsigned int i = 0; i < mesh.surfaces.size(); ++i)
+    {
+        this->surfaces[0] = mesh.surfaces[0];
+    }
+}
 
 Mesh::Mesh(vector<Surface*> inputSurfaces)
 {
-    this->surfaces = inputSurfaces;
+    surfaces = inputSurfaces;
 }
 
 void Mesh::operator=(const Mesh otherMesh)
 {
-    this->surfaces = otherMesh.getSurfaces();
+    surfaces = otherMesh.getSurfaces();
 }
-
-/*bool Mesh::operator==(const Surface) const
-{
-    return ;
-}*/
 
 vector<Surface*> Mesh::getSurfaces(void) const
 {
-    return this->surfaces;
+    return surfaces;
 }

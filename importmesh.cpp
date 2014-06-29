@@ -48,6 +48,7 @@ void importMesh::test()
 
 
 bool importMesh::import( const char * path,
+                        //Mesh &out_mesh,
                         vector<QVector3D> & out_vertices,
                         vector<QVector2D> & out_uvs,
                         vector<QVector3D> & out_normals,
@@ -55,12 +56,13 @@ bool importMesh::import( const char * path,
                         vector<unsigned int> & _uvIndices,
                         vector<unsigned int> & _normalIndices )
 {
-    vector<QVector3D> temp_vertices;
-    vector<QVector2D> temp_uvs;
-    vector<QVector3D> temp_normals;
+
     fstream file;
     string fullFile;
     string line;
+
+    Surface* currentSurface = NULL;
+    Face* currentFace = NULL;
 
     unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
 
@@ -109,7 +111,7 @@ bool importMesh::import( const char * path,
             float x, y, z;
             ss >> x >> y >> z;
             QVector3D vertex(x,y,z);
-            temp_vertices.push_back(vertex);
+            out_vertices.push_back(vertex);
         }
         else if(line.compare(0,2, "vt" ) == 0)
         {
@@ -117,7 +119,17 @@ bool importMesh::import( const char * path,
             float u, v;
             ss >> u >> v;
             QVector2D uv(u, v);
-            temp_uvs.push_back(uv);
+            out_uvs.push_back(uv);
+        }
+        else if(line.compare(0,1, "s") == 0)
+        {
+            /*if(line.compare(2,1, "0") == 0 || line.compare(2,3, "off") == 0)
+            {
+
+            }*/
+            Surface newSurface;
+            //out_mesh.addSurface();
+            currentSurface = &newSurface;
         }
         else if(line.compare(0,2, "vn") == 0)
         {
@@ -125,7 +137,7 @@ bool importMesh::import( const char * path,
             float x, y, z;
             ss >> x >> y >> z;
             QVector3D normal(x, y, z);
-            temp_normals.push_back(normal);
+            out_normals.push_back(normal);
         }
         else if(line.compare(0,1, "f") == 0)
         {
@@ -167,10 +179,6 @@ bool importMesh::import( const char * path,
         ln = strtok(NULL, "\n");
         line.clear();
     }
-
-    out_vertices    =   temp_vertices;
-    out_uvs         =   temp_uvs;
-    out_normals     =   temp_normals;
 
     delete[] cstr;
     return true;

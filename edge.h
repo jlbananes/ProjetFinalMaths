@@ -1,14 +1,17 @@
 #ifndef EDGE_H
 #define EDGE_H
 
-#include <vector>
 #include "Point.h"
+
+using namespace std;
 
 class Edge
 {
     private:
         vector<Point*> points;
     public:
+        Edge();
+        Edge(const Edge &edge);
         Edge(Point*, Point*);
         void operator=(const Edge) ;
         bool operator==(const Edge) const;

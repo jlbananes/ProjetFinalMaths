@@ -8,8 +8,8 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
+    Data sceneData;
     qmlRegisterType<Drawing>("OpenGLUnderQML", 1, 0, "Drawing");
-    Retopology::TestFunction();
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);

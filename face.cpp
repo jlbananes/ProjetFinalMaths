@@ -1,5 +1,17 @@
 #include "Face.h"
 
+Face::Face()
+{
+
+}
+
+Face::Face(const Face &face)
+{
+    this->edges[0] = face.edges[0];
+    this->edges[1] = face.edges[1];
+    this->edges[2] = face.edges[2];
+}
+
 Face::Face(Edge* AB,Edge* BC, Edge* CA)
 {
     if (AB != BC && BC != CA)

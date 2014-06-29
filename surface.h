@@ -1,14 +1,17 @@
 #ifndef SURFACE_H
 #define SURFACE_H
 
-#include <vector>
 #include "Face.h"
+
+using namespace std;
 
 class Surface
 {
     private:
         vector<Face*> faces;
     public:
+        Surface(void);
+        Surface(const Surface &surface);
         Surface(vector<Face*>);
         void operator=(const Surface);
         //bool operator==(const Surface) const;

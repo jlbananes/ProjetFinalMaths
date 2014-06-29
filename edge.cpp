@@ -1,18 +1,29 @@
 #include "Edge.h"
 #include <cmath>
 
+Edge::Edge()
+{
+
+}
+
+Edge::Edge(const Edge &edge)
+{
+    this->points[0] = edge.points[0];
+    this->points[1] = edge.points[1];
+}
+
 Edge::Edge(Point* A, Point* B)
 {
     if (A != B)
     {
-        this->points.push_back(A);
-        this->points.push_back(B);
+        points.push_back(A);
+        points.push_back(B);
     }
 }
 
 void Edge::operator=(const Edge otherEdge)
 {
-    this->points = otherEdge.points;
+    points = otherEdge.points;
 }
 
 bool Edge::operator==(const Edge otherEdge) const
