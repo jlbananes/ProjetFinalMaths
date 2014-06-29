@@ -9,7 +9,7 @@
 #include <istream>  //std::istream
 
 #include <QtOpenGL>
-#include "Data.h"
+#include "Mesh.h"
 
 using namespace std;
 

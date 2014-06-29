@@ -3,8 +3,8 @@
         <file>qml/ProjetFinalMaths/main.qml</file>
     </qresource>
     <qresource prefix="/Shaders">
-        <file>Shaders/FragmentShader.frag</file>
-        <file>Shaders/VertexShader.vert</file>
+        <file alias="FragmentShader">Shaders/FragmentShader.frag</file>
+        <file alias="VertexShader">Shaders/VertexShader.vert</file>
     </qresource>
     <qresource prefix="/Textures">
         <file>Textures/texture_caisse.jpg</file>

@@ -16,18 +16,11 @@ Drawing::Drawing()
     currentRotationMatrix.setToIdentity();
     tempXmove = 0;
     tempYmove = 0;
+    tempZmove = 1;
 
     // Create an OpenGL context
     m_context = new QOpenGLContext;
     m_context->create();
-
-    importMesh iMesh;
-    if(iMesh.import("C:\\Users\\Dylan\\Documents\\GitHub\\ProjetFinalMaths\\Assets\\Dolphin\\dolphin.obj",
-                 _vertices, _uvs, _normals,
-                 _vertexIndices, _uvIndices, _normalIndices))
-    {
-        cout << "lecture ok" << endl;
-    }
 }
 
 void Drawing::setT(qreal t)
@@ -56,6 +49,46 @@ void Drawing::setY(qreal y)
         return;
     m_y = y;
     emit yChanged();
+    if (window())
+        window()->update();
+}
+
+void Drawing::setZ(qreal z)
+{
+    if(z==m_z)
+        return;
+    m_z = z;
+    emit zChanged();
+    if (window())
+        window()->update();
+}
+
+void Drawing::setMODE(int mode)
+{
+    if(mode==m_mode)
+        return;
+    m_mode = mode;
+    emit modeChanged();
+    if (window())
+        window()->update();
+}
+
+void Drawing::setPATH(QString path)
+{
+    if(path==m_path)
+        return;
+    m_path = path;
+    emit pathChanged();
+    if (window())
+        window()->update();
+}
+
+void Drawing::setLEVEL(qreal level)
+{
+    if(level==m_level)
+        return;
+    m_level = level;
+    emit levelChanged();
     if (window())
         window()->update();
 }
@@ -149,8 +182,45 @@ void Drawing::handleWindowChanged(QQuickWindow *win)
     }
 }*/
 
+void Drawing::changeFile()
+{    string currentPath;
+     string mpath;
+     if(m_path!="")
+     {
+         mpath = m_path.toStdString().substr(8);
+         if(mpath!="" && mpath!=currentPath)
+         {
+             currentPath = mpath;
+             if(objectsOnScene!=0)
+             {
+                 _vertices.clear();
+                 _uvs.clear();
+                 _normals.clear();
+                 _vertexIndices.clear();
+                 _uvIndices.clear();
+                 _normalIndices.clear();
+                 glFlush();
+                 objectsOnScene = 0;
+             }
+
+             importMesh iMesh;
+             if(iMesh.import(mpath.data(),
+                             _vertices, _uvs, _normals,
+                             _vertexIndices, _uvIndices, _normalIndices))
+             {
+                 objectsOnScene += 1;
+                 cout << "lecture ok" << endl;
+             }
+
+         }
+     }
+
+}
+
 void Drawing::paint()
 {
+    changeFile();
+
     unsigned int i = 0;
     unsigned int el = 0;
     unsigned int id = 0;
@@ -184,8 +254,10 @@ void Drawing::paint()
         cout << idex3[i] << " " << idex3[i+1] << " " << idex3[i+2] << endl;
     }
     //*/
+    unsigned int zoom = 1;
+    zoom = m_z<1?0:m_z;
     QMatrix4x4 cameraTransformation;
-    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 2);
+    QVector3D cameraPosition = cameraTransformation * QVector3D(0, 0, 1*zoom);
     QVector3D cameraUpDirection = cameraTransformation * QVector3D(0, 1, 0);
     GLint time;
 
@@ -231,7 +303,7 @@ void Drawing::paint()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
     //glLightfv(GL_LIGHT0, GL_POSITION, lightpos);y
-    glClearColor(0, 1, 1, 1.0);
+    glClearColor(0.4, 0.4, 0.4, 1.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     if (!m_program)
@@ -574,28 +646,43 @@ void Drawing::paint()
     //*/
     m_vao0->release();
 
-    // affichage des faces
-    /*m_vao0->bind();
-    glDrawElements(GL_TRIANGLES,id,GL_UNSIGNED_INT,0);
-    m_vao0->release();
-    m_program->release();*/
-
-
-    // affichage des edges
-    /*m_vao0->bind();
-    for (unsigned int i=0 ; i<id/3 ; i++)
+    switch(m_mode)
     {
-        glDrawElements(GL_LINE_LOOP,3,GL_UNSIGNED_INT, reinterpret_cast<void*>((3*i)*sizeof(unsigned int)));
+    case 3:
+        // affichage des faces
+        m_vao0->bind();
+        glDrawElements(GL_TRIANGLES,id,GL_UNSIGNED_INT,0);
+        m_vao0->release();
+        m_program->release();
+        break;
+
+    case 2:
+        // affichage des edges
+        m_vao0->bind();
+        for (unsigned int i=0 ; i<id/3 ; i++)
+        {
+            glDrawElements(GL_LINE_LOOP,3,GL_UNSIGNED_INT, reinterpret_cast<void*>((3*i)*sizeof(unsigned int)));
+        }
+        m_vao0->release();
+        m_program->release();
+        break;
+
+    case 1:
+        // affichage des points
+        m_vao0->bind();
+        glPointSize(2.5);
+        glDrawElements(GL_POINTS,id,GL_UNSIGNED_INT,0);
+        m_vao0->release();
+        m_program->release();
+        break;
+
+    default:
+        m_vao0->bind();
+        glDrawElements(GL_TRIANGLES,id,GL_UNSIGNED_INT,0);
+        m_vao0->release();
+        m_program->release();
+        break;
     }
-    m_vao0->release();
-    m_program->release();*/
-
-    // affichage des points
-    m_vao0->bind();
-    glDrawElements(GL_POINTS,id,GL_UNSIGNED_INT,0);
-    m_vao0->release();
-    m_program->release();
-
 }
 
 void Drawing::cleanup()
@@ -611,5 +698,9 @@ void Drawing::sync()
     m_thread_t = m_t;
     m_thread_x = m_x;
     m_thread_y = m_y;
+    m_thread_z = m_z;
+    m_thread_mode = m_mode;
+    m_thread_path = m_path;
+    m_thread_level = m_level;
     m_thread_clickedButton = m_clickedButton;
 }

@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    Data sceneData;
+    //Data sceneData;
     qmlRegisterType<Drawing>("OpenGLUnderQML", 1, 0, "Drawing");
 
     QQuickView view;
